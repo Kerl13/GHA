@@ -75,7 +75,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 if len(data['commits']) == 1: text += '1 commit '
                 else: text += '%d commits ' % len(data['commits'])
                 text += 'to %c%d%s%c/' % (3, 13, data['repository']['full_name'], 3)
-                text += '%c%d%s%c\n' % (3, 5, data['ref']s.plit('/').pop(), 3)
+                text += '%c%d%s%c\n' % (3, 5, data['ref'].split('/').pop(), 3)
                 for commit in data['commits']:
                     text += '[%c%d%s%c] ' % (3, 14, commit['id'][:7], 3)
                     text += '%c%s%c: ' % (2, commit['author']['name'], 2)
