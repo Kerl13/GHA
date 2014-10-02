@@ -99,6 +99,14 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 else:
                     text += 'Not implemented. event=create, ref_type='+data['ref_type']
 
+            elif event == 'delete':
+                if data['ref_type'] == 'branch':
+                    text += '%c%d%s%c deleted ' % (3, 11, data['sender']['login'], 3)
+                    text += 'the branch %c%d%s%c ' % (3, 5, data['ref'], 3)
+                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                else:
+                    text += 'Not implemented. event=delete, ref_type='+data['ref_type']
+
             elif 'zen' in data:
                 text += '%c%d%s%c added ' % (3, 11, data['sender']['login'], 3)
                 text += 'a webhook for %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
