@@ -96,7 +96,7 @@ TODO
 |          | Deployment status           | Deployment status updated from the API.                          |
 |          | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
 |          | Pull Request review comment | Pull Request diff commented on.                                  |
-|          | Commit comment              | Commit or diff commented on.                                     |
+| **Done** | Commit comment              | Commit or diff commented on.                                     |
 | **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
 | **Done** | Issue comment               | Issue commented on.                                              |
 |          | Watch                       | User watches a repository.                                       |

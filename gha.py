@@ -108,6 +108,12 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 else:
                     text += 'Not implemented. event=delete, ref_type='+data['ref_type']
 
+            elif event == 'commit_comment':
+                text += '%c%d%s%c commented ' % (3, 11, data['sender']['login'], 3)
+                text += 'the commit %c%d%s%c ' % (3, 14, data['comment']['commit_id'][:7], 3)
+                text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
+                text += data['comment']['body'].split('\n')[0]
+
             elif 'zen' in data:
                 text += '%c%d%s%c added ' % (3, 11, data['sender']['login'], 3)
                 text += 'a webhook for %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
