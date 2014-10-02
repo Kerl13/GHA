@@ -81,15 +81,16 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             text = ''
             ###
             if event == 'push':
-                text += '%c%d%s%c pushed ' % (3, 11, data['pusher']['name'], 3)
-                if len(data['commits']) == 1: text += '1 commit '
-                else: text += '%d commits ' % len(data['commits'])
-                text += 'to %c%d%s%c/' % (3, 13, data['repository']['full_name'], 3)
-                text += '%c%d%s%c\n' % (3, 5, data['ref'].split('/').pop(), 3)
-                for commit in data['commits']:
-                    text += '[%c%d%s%c] ' % (3, 14, commit['id'][:7], 3)
-                    text += '%c%s%c: ' % (2, commit['author']['name'], 2)
-                    text += '%s\n' % commit['message'].split('\n')[0]
+                if len(data['commits']) > 0:
+                    text += '%c%d%s%c pushed ' % (3, 11, data['pusher']['name'], 3)
+                    if len(data['commits']) == 1: text += '1 commit '
+                    else: text += '%d commits ' % len(data['commits'])
+                    text += 'to %c%d%s%c/' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%c%d%s%c\n' % (3, 5, data['ref'].split('/').pop(), 3)
+                    for commit in data['commits']:
+                        text += '[%c%d%s%c] ' % (3, 14, commit['id'][:7], 3)
+                        text += '%c%s%c: ' % (2, commit['author']['name'], 2)
+                        text += '%s\n' % commit['message'].split('\n')[0]
 
             elif event == 'create':
                 if data['ref_type'] == 'branch':
