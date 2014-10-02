@@ -5,3 +5,6 @@
 # emacs
 *~
 *#
+
+# gha
+*.log
