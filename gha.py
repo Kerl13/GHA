@@ -59,8 +59,17 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             self.serv.join(chan)
         self.routine()
 
-    def prnt(self, text):
-        for chan in self.chans:
+    def on_pubmsg(self, serv, ev):
+        if args.irc_name in ev.arguments()[0]:
+            self.prnt('I am an announcer bot for github.\nI\'m printing the webhooks i receive on %s:%d on channels %s.\nUse me please ;)' % (args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.target()])
+
+    def on_privmsg(self, serv, ev):
+        if args.irc_name in ev.arguments()[0]:
+            self.prnt('I am an announcer bot for github.\nI\'m printing the webhooks i receive on %s:%d on channels %s.\nUse me please ;)' % (args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.source()])
+
+    def prnt(self, text, chans=None):
+        if chans == None: chans = self.chans
+        for chan in chans:
             for line in text.split('\n'):
                 self.serv.privmsg(chan, line)
 
