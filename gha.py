@@ -35,7 +35,8 @@ class BottleThread(multiprocessing.Process):
     def run(self):
         @self.app.route('/', method='POST')
         def index():
-            self.queue.put(request.body.read())
+            self.queue.put((request.headers.get('X-Github-Event'),
+                            request.body.read()))
             return 'Data received, thanks ;)'
 
         try:
@@ -75,11 +76,11 @@ class PrinterBot(ircbot.SingleServerIRCBot):
 
     def routine(self):
         try:
-            a = self.queue.get_nowait()
-            data = loads(a)
+            event, data = self.queue.get_nowait()
+            data = loads(data)
             text = ''
             ###
-            if 'pusher' in data:
+            if event == 'push':
                 text += '%c%d%s%c pushed ' % (3, 11, data['pusher']['name'], 3)
                 if len(data['commits']) == 1: text += '1 commit '
                 else: text += '%d commits ' % len(data['commits'])
@@ -89,6 +90,14 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                     text += '[%c%d%s%c] ' % (3, 14, commit['id'][:7], 3)
                     text += '%c%s%c: ' % (2, commit['author']['name'], 2)
                     text += '%s\n' % commit['message'].split('\n')[0]
+
+            elif event == 'create':
+                if data['ref_type'] == 'branch':
+                    text += '%c%d%s%c created ' % (3, 11, data['sender']['login'], 3)
+                    text += 'the branch %c%d%s%c ' % (3, 5, data['ref'], 3)
+                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                else:
+                    text += 'Not implemented. event=create, ref_type='+data['ref_type']
 
             elif 'zen' in data:
                 text += '%c%d%s%c added ' % (3, 11, data['sender']['login'], 3)
@@ -135,7 +144,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                     text += ' [%s]' % data['action']
 
             else:
-                text = 'I just received some data that i\'m not able to parse :('
+                text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###
             self.prnt(text)
         except Empty:

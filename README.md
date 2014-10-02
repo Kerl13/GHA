@@ -89,7 +89,7 @@ TODO
 | Status   | Event                       | Comment                                                          |
 |----------|-----------------------------|------------------------------------------------------------------|
 | **Done** | Push                        | Git push to a repository.                                        |
-|          | Create                      | Branch, or tag created.                                          |
+| WIP      | Create                      | Branch, or tag created.                                          |
 |          | Delete                      | Branch or tag deleted.                                           |
 |          | Status                      | Commit status updated from the API.                              |
 |          | Deployment                  | Repository deployed.                                             |
