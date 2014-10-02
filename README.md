@@ -86,6 +86,11 @@ You just DO WHAT THE FUCK YOU WANT TO.
 TODO
 ----
 
+* Make the colors easier and nicer to use
+* Make the script modular (config file ?)
+* Support many languages (?)
+* Support all hooks :
+
 | Status   | Event                       | Comment                                                          |
 |----------|-----------------------------|------------------------------------------------------------------|
 | **Done** | Push                        | Git push to a repository.                                        |
