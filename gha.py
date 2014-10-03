@@ -23,7 +23,8 @@ args = parser.parse_args()
 
 
 ################################################################################
-colorize = lambda s, c: '%c%c%d%s%c%c' % (2, 3, c, s, 3, 2)
+colorize = lambda c, s: '%c%c%d%s%c%c' % (2, 3, c, s, 3, 2)
+col = colorize
 gray   = 14
 pink   = 13
 blue   = 12
@@ -91,6 +92,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         try:
             event, data = self.queue.get_nowait()
             data = loads(data)
+            # LA COLORATION POURRAIT SE FAIRE ICI, À MÊME data…
             text = ''
             ###
             if event == 'push':
