@@ -196,6 +196,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             except: pass
             try:
                 forkee = colorize(red, data['forkee']['full_name'])
+            except: pass
             text = ''
             ###
             if event == 'push':
