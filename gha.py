@@ -61,11 +61,11 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         self.routine()
 
     def on_pubmsg(self, serv, ev):
-        if args.irc_name in ev.arguments()[0]:
+        if ev.arguments()[0] == args.irc_name+': help':
             self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (args.gh_host, args.gh_port, args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.target()])
 
     def on_privmsg(self, serv, ev):
-        if args.irc_name in ev.arguments()[0]:
+        if ev.arguments()[0] == args.irc_name+': help':
             self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (args.gh_host, args.gh_port, args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.source()])
 
     def prnt(self, text, chans=None):
