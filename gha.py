@@ -194,6 +194,8 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             try:
                 assignee = colorize(cyan, data['issue']['assignee']['login'])
             except: pass
+            try:
+                forkee = colorize(red, data['forkee']['full_name'])
             text = ''
             ###
             if event == 'push':
@@ -254,6 +256,9 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             ###
             elif event == 'watch':
                 text = '%s starred %s' % (sender, repository)
+            ###
+            elif event == 'fork':
+                text = '%s forked %s to %s' % (sender, repository, forkee)
             ###
             else:
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event
