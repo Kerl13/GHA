@@ -112,8 +112,11 @@ class BottleThread(multiprocessing.Process):
     def run(self):
         @self.app.route('/', method='POST')
         def index():
-            self.queue.put((request.headers.get('X-Github-Event'),
-                            request.body.read()))
+            try:
+                self.queue.put((request.headers.get('X-Github-Event'),
+                                request.body.read()))
+            except:
+                print 'Error: bad request.'
             return 'Data received, thanks ;)'
 
         try:
@@ -249,7 +252,8 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###
             self.prnt(text)
-        except Empty:
+        
+        except:
             pass
         irclib.ServerConnection.execute_delayed(self.serv, 1, self.routine)
 
