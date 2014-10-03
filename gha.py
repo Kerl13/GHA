@@ -252,6 +252,9 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 text = '%s answered to the issue %s on %s' \
                     % (sender, issue, repository)
             ###
+            elif event == 'watch':
+                text = '%s starred %s' % (sender, repository)
+            ###
             else:
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###

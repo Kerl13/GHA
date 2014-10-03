@@ -105,7 +105,7 @@ TODO
 | **Done** | Commit comment              | Commit or diff commented on.                                     |
 | **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
 | **Done** | Issue comment               | Issue commented on.                                              |
-|          | Watch                       | User watches a repository.                                       |
+| **Done** | Watch                       | User watches a repository.                                       |
 |          | Fork                        | Repository forked.                                               |
 |          | Public                      | Repository changes from private to public.                       |
 |          | Member                      | Collaborator added to a non-organization repository.             |
