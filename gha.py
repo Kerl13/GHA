@@ -5,7 +5,7 @@ from bottle import Bottle, request
 from time import sleep
 import ircbot
 import irclib
-from json import loads
+from json import dumps, loads
 import argparse
 from sys import argv
 
@@ -19,7 +19,69 @@ parser.add_argument('-ip', '--irc-port', type=int, help='the irc server\'s port'
 parser.add_argument('-ic', '--irc-chans', nargs='*', help='the irc channels')
 parser.add_argument('-in', '--irc-name', type=str, help='the bot\'s name')
 
+parser.add_argument('-ea', '--export-arguments', metavar='FILE', type=str, help='export arguments in the given file')
+parser.add_argument('-ia', '--import-arguments', metavar='FILE', type=str, help='import arguments from the given file')
+
 args = parser.parse_args()
+
+class Arguments:
+    GH_HOST = None
+    GH_PORT = None
+    IRC_HOST = None
+    IRC_PORT = None
+    IRC_CHANS = None
+    IRC_NAME = None
+    def to_dictionnary(self):
+        d = {}
+        if self.GH_HOST: d['gh-host'] = self.GH_HOST
+        if self.GH_PORT: d['gh-port'] = self.GH_PORT
+        if self.IRC_HOST: d['irc-host'] = self.IRC_HOST
+        if self.IRC_PORT: d['irc-port'] = self.IRC_PORT
+        if self.IRC_CHANS: d['irc-chans'] = self.IRC_CHANS
+        if self.IRC_NAME: d['irc-name'] = self.IRC_NAME
+        return d
+    def from_dictionnary(self, d):
+        if 'gh-host' in d: self.GH_HOST = d['gh-host']
+        if 'gh-port' in d: self.GH_HOST = d['gh-port']
+        if 'irc-host' in d: self.GH_HOST = d['irc-host']
+        if 'irc-port' in d: self.GH_HOST = d['irc-port']
+        if 'irc-chans' in d: self.GH_HOST = d['irc-chans']
+        if 'irc-name' in d: self.GH_HOST = d['irc-name']
+    def give_errors(self):
+        text = ''
+        if not self.GH_HOST: text += 'You need to give a gh-host.\n'
+        if not self.GH_PORT: text += 'You need to give a gh-port.\n'
+        if not self.IRC_HOST: text += 'You need to give a irc-host.\n'
+        if not self.IRC_PORT: text += 'You need to give a irc-port.\n'
+        if not self.IRC_CHANS: text += 'You need to give a irc-chans.\n'
+        if not self.IRC_NAME: text += 'You need to give a irc-name.\n'
+        return text
+
+ARGS = Arguments()
+
+if args.import_arguments:
+    try:
+        d = loads(open(args.import_arguments).read())
+        ARGS.from_dictionnary(d)
+    except IOError:
+        print 'Error: the file %s doesn\'t exist' % args.import_arguments
+        exit(1)
+
+if args.gh_host: ARGS.GH_HOST = args.gh_host
+if args.gh_port: ARGS.GH_PORT = args.gh_port
+if args.irc_host: ARGS.IRC_HOST = args.irc_host
+if args.irc_port: ARGS.IRC_PORT = args.irc_port
+if args.irc_chans: ARGS.IRC_CHANS = args.irc_chans
+if args.irc_name: ARGS.IRC_NAME = args.irc_name
+
+if args.export_arguments:
+    open(args.export_arguments, 'w+').write(dumps(ARGS.to_dictionnary()))
+    exit(0)
+
+errors = ARGS.give_errors()
+if errors:
+    print errors[:len(errors)-1]
+    exit(1)
 
 
 ################################################################################
@@ -75,12 +137,12 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         self.routine()
 
     def on_pubmsg(self, serv, ev):
-        if ev.arguments()[0] == args.irc_name+': help':
-            self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (args.gh_host, args.gh_port, args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.target()])
+        if ev.arguments()[0] == ARGS.IRC_NAME+': help':
+            self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (ARGS.GH_HOST, ARGS.GH_PORT, ARGS.IRC_HOST, ARGS.IRC_PORT, ', '.join(ARGS.IRC_CHANS)), [ev.target()])
 
     def on_privmsg(self, serv, ev):
-        if ev.arguments()[0] == args.irc_name+': help':
-            self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (args.gh_host, args.gh_port, args.irc_host, args.irc_port, ', '.join(args.irc_chans)), [ev.source()])
+        if ev.arguments()[0] == ARGS.IRC_NAME+': help':
+            self.prnt('I am an announcer bot for github.\nI\'m waiting for webhooks on %s:%d, and printing them on %s:%d on channels %s.\nUse me please ;)' % (ARGS.GH_HOST, ARGS.GH_PORT, ARGS.IRC_HOST, ARGS.IRC_PORT, ', '.join(ARGS.IRC_CHANS)), [ev.source()])
 
     def prnt(self, text, chans=None):
         if chans == None: chans = self.chans
@@ -92,7 +154,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         try:
             event, data = self.queue.get_nowait()
             data = loads(data)
-            # LA COLORATION POURRAIT SE FAIRE ICI, À MÊME data…
+            # LA COLORATION POURRAIT SE FAIRE ICI, A MEME data...
             text = ''
             ###
             if event == 'push':
@@ -182,7 +244,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
 ################################################################################
 
 queue = Queue()
-BottleThread(args.gh_host, args.gh_port, queue).start()
+BottleThread(ARGS.GH_HOST, ARGS.GH_PORT, queue).start()
 
-pb = PrinterBot(args.irc_host, args.irc_port, args.irc_chans, args.irc_name, queue).start()
+pb = PrinterBot(ARGS.IRC_HOST, ARGS.IRC_PORT, ARGS.IRC_CHANS, ARGS.IRC_NAME, queue).start()
 

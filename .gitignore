@@ -8,3 +8,4 @@
 
 # gha
 *.log
+*.cnf
