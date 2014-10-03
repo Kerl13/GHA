@@ -155,84 +155,96 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         try:
             event, data = self.queue.get_nowait()
             data = loads(data)
-            # LA COLORATION POURRAIT SE FAIRE ICI, A MEME data...
+            ###
+            try:
+                pusher = colorize(cyan, data['pusher']['name'])
+            except: pass
+            try:
+                sender = colorize(cyan, data['sender']['login'])
+            except: pass
+            try:
+                repository = colorize(pink, data['repository']['full_name'])
+            except: pass
+            try:
+                commit_number = '%c%d%c commit' % (2, len(data['commits']), 2)
+                if len(data['commits'])>1: commit_number += 's'
+            except: pass
+            try:
+                branch = colorize(red, data['ref'].split('/').pop())
+            except: pass
+            try:
+                commits = []
+                for commit in data['commits']:
+                    commits.append(( colorize(gray, commit['id'][:7]),
+                                     colorize(cyan, commit['author']['name']),
+                                     commit['message'].split('\n')[0] ))
+            except: pass
+            try:
+                short_id = colorize(gray, data['comment']['commit_id'][:7])
+            except: pass
+            try:
+                issue = colorize(gray, '#%d' % data['issue']['number'])
+            except: pass
+            try:
+                issue_title = data['issue']['title']
+            except: pass
+            try:
+                assignee = colorize(cyan, data['issue']['assignee']['login'])
+            except: pass
             text = ''
             ###
             if event == 'push':
-                if len(data['commits']) > 0:
-                    text += '%s pushed ' % data['pusher']['name']
-                    if len(data['commits']) == 1: text += '1 commit '
-                    else: text += '%d commits ' % len(data['commits'])
-                    text += 'to %s/' % data['repository']['full_name']
-                    text += '%s\n' % data['ref'].split('/').pop()
-                    for commit in data['commits']:
-                        text += '[%s] ' % commit['id'][:7]
-                        text += '%s: ' % commit['author']['name']
-                        text += '%s\n' % commit['message'].split('\n')[0]
-
+                if len(commits) > 0:
+                    text = '%s pushed %s to %s/%s\n' \
+                        % (pusher, commit_number, repository, branch)
+                    for short_id, author, message in commits:
+                        text += '[%s] %s\n' % (short_id, message)
+            ###
             elif event == 'create':
                 if data['ref_type'] == 'branch':
-                    text += '%s created ' % data['sender']['login']
-                    text += 'the branch %s ' % data['ref']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s created the branch %s on %s' % (sender, branch, repository)
                 else:
-                    text += 'Not implemented. event=create, ref_type='+data['ref_type']
-
+                    text = 'Not implemented. event=create, ref_type='+data['ref_type']
+            ###
             elif event == 'delete':
                 if data['ref_type'] == 'branch':
-                    text += '%s deleted ' % data['sender']['login']
-                    text += 'the branch %s ' % data['ref']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s deleted the branch %s on %s' % (sender, branch, repository)
                 else:
-                    text += 'Not implemented. event=delete, ref_type='+data['ref_type']
-
+                    text = 'Not implemented. event=delete, ref_type='+data['ref_type']
+            ###
             elif event == 'commit_comment':
-                text += '%s commented ' % data['sender']['login']
-                text += 'the commit %s ' % data['comment']['commit_id'][:7]
-                text += 'on %s: ' % data['repository']['full_name']
-                text += data['comment']['body'].split('\n')[0]
-
-            elif 'zen' in data:
-                text += '%s added ' % data['sender']['login']
-                text += 'a webhook for %s' % data['repository']['full_name']
-
-            elif 'issue' in data:
+                text = '%s commented the commit %s on %s' % (sender, short_id, repository)
+            ###
+            elif event == 'ping':
+                text = '%s added a webhook for %s' % (sender, repository)
+            ###
+            elif event == 'issues':
                 if data['action'] == 'opened': # Creation d'une issue
-                    text += '%s opened ' % data['sender']['login']
-                    text += 'the issue #%d ' % data['issue']['number']
-                    text += 'on %s: ' % data['repository']['full_name']
-                    text += data['issue']['title']
-
-                elif data['action'] == 'created': # Reponse a une issue
-                    text += '%s answered ' % data['sender']['login']
-                    text += 'to the issue #%d ' % data['issue']['number']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s opened the issue %s on %s: %s' \
+                        % (sender, issue, repository, issue_title)
 
                 elif data['action'] == 'labeled': # Ajout de labels
-                    text += '%s labeled ' % data['sender']['login']
-                    text += 'the issue #%d ' % data['issue']['number']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s labeled the issue %s on %s' \
+                        % (sender, issue, repository)
 
                 elif data['action'] == 'assigned': # Assignation de quelqu'un
-                    text += '%s assigned ' % data['sender']['login']
-                    text += '%s ' % data['issue']['assignee']['login']
-                    text += 'on the issue #%d ' % data['issue']['number']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s assigned %s on the issue %s on %s' \
+                        % (sender, assignee, issue, repository)
 
                 elif data['action'] == 'closed': # Fermeture
-                    text += '%s closed ' % data['sender']['login']
-                    text += 'the issue #%d ' % data['issue']['number']
-                    text += 'on %s' % data['repository']['full_name']
+                    text = '%s closed the issue %s on %s' \
+                        % (sender, issue, repository)
 
                 elif data['action'] == 'reopened': # Reouverture
-                    text += '%s reopened ' % data['sender']['login']
-                    text += 'the issue %c%d#%d%c ' % data['issue']['number']
-                    text += 'on %s' % data['repository']['full_name']
-
+                    text = '%s reopened the issue %s on %s' \
+                        % (sender, issue, repository)
                 else:
-                    text += 'I received some data on an issue, that i\'m not able to parse :('
-                    text += ' [%s]' % data['action']
-
+                    text = 'I received some data on an issue, that i\'m not able to parse :('
+            ###
+            elif event == 'issue_comment':
+                text = '%s answered to the issue %s on %s' \
+                    % (sender, issue, repository)
+            ###
             else:
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###
