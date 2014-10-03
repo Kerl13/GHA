@@ -42,11 +42,11 @@ class Arguments:
         return d
     def from_dictionnary(self, d):
         if 'gh-host' in d: self.GH_HOST = d['gh-host']
-        if 'gh-port' in d: self.GH_HOST = d['gh-port']
-        if 'irc-host' in d: self.GH_HOST = d['irc-host']
-        if 'irc-port' in d: self.GH_HOST = d['irc-port']
-        if 'irc-chans' in d: self.GH_HOST = d['irc-chans']
-        if 'irc-name' in d: self.GH_HOST = d['irc-name']
+        if 'gh-port' in d: self.GH_PORT = d['gh-port']
+        if 'irc-host' in d: self.IRC_HOST = d['irc-host']
+        if 'irc-port' in d: self.IRC_PORT = d['irc-port']
+        if 'irc-chans' in d: self.IRC_CHANS = d['irc-chans']
+        if 'irc-name' in d: self.IRC_NAME = d['irc-name']
     def give_errors(self):
         text = ''
         if not self.GH_HOST: text += 'You need to give a gh-host.\n'
@@ -82,6 +82,7 @@ errors = ARGS.give_errors()
 if errors:
     print errors[:len(errors)-1]
     exit(1)
+
 
 
 ################################################################################
