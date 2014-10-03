@@ -89,6 +89,7 @@ TODO
 * Make the colors easier and nicer to use
 * Make the script modular (config file ?)
 * Support many languages (?)
+* Add a script that helps to parametrize all hooks simultaneously (https://help.github.com/articles/connecting-with-third-party-applications/)
 * Support all hooks :
 
 | Status   | Event                       | Comment                                                          |
