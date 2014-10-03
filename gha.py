@@ -23,6 +23,19 @@ args = parser.parse_args()
 
 
 ################################################################################
+colorize = lambda s, c: '%c%c%d%s%c%c' % (2, 3, c, s, 3, 2)
+gray   = 14
+pink   = 13
+blue   = 12
+cyan   = 11
+green  = 9
+yellow = 7
+red    = 5
+black  = 1
+white  = 15
+
+
+################################################################################
 class BottleThread(multiprocessing.Process):
 
     def __init__(self, host, port, queue):
@@ -82,74 +95,74 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             ###
             if event == 'push':
                 if len(data['commits']) > 0:
-                    text += '%c%d%s%c pushed ' % (3, 11, data['pusher']['name'], 3)
+                    text += '%s pushed ' % data['pusher']['name']
                     if len(data['commits']) == 1: text += '1 commit '
                     else: text += '%d commits ' % len(data['commits'])
-                    text += 'to %c%d%s%c/' % (3, 13, data['repository']['full_name'], 3)
-                    text += '%c%d%s%c\n' % (3, 5, data['ref'].split('/').pop(), 3)
+                    text += 'to %s/' % data['repository']['full_name']
+                    text += '%s\n' % data['ref'].split('/').pop()
                     for commit in data['commits']:
-                        text += '[%c%d%s%c] ' % (3, 14, commit['id'][:7], 3)
-                        text += '%c%s%c: ' % (2, commit['author']['name'], 2)
+                        text += '[%s] ' % commit['id'][:7]
+                        text += '%s: ' % commit['author']['name']
                         text += '%s\n' % commit['message'].split('\n')[0]
 
             elif event == 'create':
                 if data['ref_type'] == 'branch':
-                    text += '%c%d%s%c created ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the branch %c%d%s%c ' % (3, 5, data['ref'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s created ' % data['sender']['login']
+                    text += 'the branch %s ' % data['ref']
+                    text += 'on %s' % data['repository']['full_name']
                 else:
                     text += 'Not implemented. event=create, ref_type='+data['ref_type']
 
             elif event == 'delete':
                 if data['ref_type'] == 'branch':
-                    text += '%c%d%s%c deleted ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the branch %c%d%s%c ' % (3, 5, data['ref'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s deleted ' % data['sender']['login']
+                    text += 'the branch %s ' % data['ref']
+                    text += 'on %s' % data['repository']['full_name']
                 else:
                     text += 'Not implemented. event=delete, ref_type='+data['ref_type']
 
             elif event == 'commit_comment':
-                text += '%c%d%s%c commented ' % (3, 11, data['sender']['login'], 3)
-                text += 'the commit %c%d%s%c ' % (3, 14, data['comment']['commit_id'][:7], 3)
-                text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
+                text += '%s commented ' % data['sender']['login']
+                text += 'the commit %s ' % data['comment']['commit_id'][:7]
+                text += 'on %s: ' % data['repository']['full_name']
                 text += data['comment']['body'].split('\n')[0]
 
             elif 'zen' in data:
-                text += '%c%d%s%c added ' % (3, 11, data['sender']['login'], 3)
-                text += 'a webhook for %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                text += '%s added ' % data['sender']['login']
+                text += 'a webhook for %s' % data['repository']['full_name']
 
             elif 'issue' in data:
                 if data['action'] == 'opened': # Creation d'une issue
-                    text += '%c%d%s%c opened ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s opened ' % data['sender']['login']
+                    text += 'the issue #%d ' % data['issue']['number']
+                    text += 'on %s: ' % data['repository']['full_name']
                     text += data['issue']['title']
 
                 elif data['action'] == 'created': # Reponse a une issue
-                    text += '%c%d%s%c answered ' % (3, 11, data['sender']['login'], 3)
-                    text += 'to the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s answered ' % data['sender']['login']
+                    text += 'to the issue #%d ' % data['issue']['number']
+                    text += 'on %s' % data['repository']['full_name']
 
                 elif data['action'] == 'labeled': # Ajout de labels
-                    text += '%c%d%s%c labeled ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s labeled ' % data['sender']['login']
+                    text += 'the issue #%d ' % data['issue']['number']
+                    text += 'on %s' % data['repository']['full_name']
 
                 elif data['action'] == 'assigned': # Assignation de quelqu'un
-                    text += '%c%d%s%c assigned ' % (3, 11, data['sender']['login'], 3)
-                    text += '%c%d%s%c ' % (3, 5, data['issue']['assignee']['login'], 3)
-                    text += 'on the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s assigned ' % data['sender']['login']
+                    text += '%s ' % data['issue']['assignee']['login']
+                    text += 'on the issue #%d ' % data['issue']['number']
+                    text += 'on %s' % data['repository']['full_name']
 
                 elif data['action'] == 'closed': # Fermeture
-                    text += '%c%d%s%c closed ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s closed ' % data['sender']['login']
+                    text += 'the issue #%d ' % data['issue']['number']
+                    text += 'on %s' % data['repository']['full_name']
 
                 elif data['action'] == 'reopened': # Reouverture
-                    text += '%c%d%s%c reopened ' % (3, 11, data['sender']['login'], 3)
-                    text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
+                    text += '%s reopened ' % data['sender']['login']
+                    text += 'the issue %c%d#%d%c ' % data['issue']['number']
+                    text += 'on %s' % data['repository']['full_name']
 
                 else:
                     text += 'I received some data on an issue, that i\'m not able to parse :('
