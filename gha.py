@@ -206,12 +206,16 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             elif event == 'create':
                 if data['ref_type'] == 'branch':
                     text = '%s created the branch %s on %s' % (sender, branch, repository)
+                elif data['ref_type'] == 'tag':
+                    text = '%s created the tag %s on %s' % (sender, branch, repository)
                 else:
                     text = 'Not implemented. event=create, ref_type='+data['ref_type']
             ###
             elif event == 'delete':
                 if data['ref_type'] == 'branch':
                     text = '%s deleted the branch %s on %s' % (sender, branch, repository)
+                elif data['ref_type'] == 'tag':
+                    text = '%s deleted the tag %s on %s' % (sender, branch, repository)
                 else:
                     text = 'Not implemented. event=delete, ref_type='+data['ref_type']
             ###
