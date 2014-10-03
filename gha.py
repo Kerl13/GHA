@@ -123,20 +123,17 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                     text += '%c%d%s%c opened ' % (3, 11, data['sender']['login'], 3)
                     text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
                     text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
-                    text += '[%c%d%s%c] ' % (3, 5, data['issue']['title'], 3)
-                    text += data['issue']['body'].split('\n')[0] + '\n'
+                    text += data['issue']['title']
 
                 elif data['action'] == 'created': # Reponse a une issue
                     text += '%c%d%s%c answered ' % (3, 11, data['sender']['login'], 3)
                     text += 'to the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
-                    text += data['comment']['body'].split('\n')[0] + '\n'
+                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
 
                 elif data['action'] == 'labeled': # Ajout de labels
                     text += '%c%d%s%c labeled ' % (3, 11, data['sender']['login'], 3)
                     text += 'the issue %c%d#%d%c ' % (3, 14, data['issue']['number'], 3)
-                    text += 'on %c%d%s%c: ' % (3, 13, data['repository']['full_name'], 3)
-                    text += ', '.join([l['name'] for l in data['issue']['labels']])
+                    text += 'on %c%d%s%c' % (3, 13, data['repository']['full_name'], 3)
 
                 elif data['action'] == 'assigned': # Assignation de quelqu'un
                     text += '%c%d%s%c assigned ' % (3, 11, data['sender']['login'], 3)
