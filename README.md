@@ -13,6 +13,7 @@ Installation
 ------------
 
 Just copy the files to some place (or clone this repository).
+
 You also need to install Bottle (http://bottlepy.org).
 That can be done with `pip install bottle`.
 There's also a version of Bottle in the repository.
@@ -65,7 +66,7 @@ After that, you only need to import your arguments from this file :
 
 And you can override the file arguments with yours :
 
-    python gha.py -ia my_file.cnf --gp 4224
+    python gha.py -ia my_file.cnf -gp 4224
 
 
 ### GitHub's side
@@ -106,8 +107,6 @@ You just DO WHAT THE FUCK YOU WANT TO.
 TODO
 ----
 
-* Make the colors easier and nicer to use
-* Make the script modular (config file ?)
 * Support many languages (?)
 * Add a script that helps to parametrize all hooks simultaneously (https://help.github.com/articles/connecting-with-third-party-applications/)
 * Support all hooks :
