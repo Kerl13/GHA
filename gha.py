@@ -241,6 +241,10 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                     text = '%s assigned %s on issue %s on %s' \
                         % (sender, assignee, issue, repository)
 
+                elif data['action'] == 'unassigned':
+                    text = '%s removed assignment on issue %s on %s' \
+                        % (sender, issue, repository)
+
                 elif data['action'] == 'closed': # Fermeture
                     text = '%s closed issue %s on %s' \
                         % (sender, issue, repository)
