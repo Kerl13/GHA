@@ -201,36 +201,36 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             ###
             if event == 'push':
                 if len(commits) > 0:
-                    text = '%s pushed %s to %s/%s\n' \
-                        % (pusher, commit_number, repository, branch)
+                    text = '%s pushed %s to %s at %s\n' \
+                        % (pusher, commit_number, branch, repository)
                     for short_id, author, message in commits:
                         text += '[%s] %s\n' % (short_id, message)
             ###
             elif event == 'create':
                 if data['ref_type'] == 'branch':
-                    text = '%s created the branch %s on %s' % (sender, branch, repository)
+                    text = '%s created branch %s at %s' % (sender, branch, repository)
                 elif data['ref_type'] == 'tag':
-                    text = '%s created the tag %s on %s' % (sender, branch, repository)
+                    text = '%s created tag %s at %s' % (sender, branch, repository)
                 else:
                     text = 'Not implemented. event=create, ref_type='+data['ref_type']
             ###
             elif event == 'delete':
                 if data['ref_type'] == 'branch':
-                    text = '%s deleted the branch %s on %s' % (sender, branch, repository)
+                    text = '%s deleted branch %s at %s' % (sender, branch, repository)
                 elif data['ref_type'] == 'tag':
-                    text = '%s deleted the tag %s on %s' % (sender, branch, repository)
+                    text = '%s deleted tag %s at %s' % (sender, branch, repository)
                 else:
                     text = 'Not implemented. event=delete, ref_type='+data['ref_type']
             ###
             elif event == 'commit_comment':
-                text = '%s commented the commit %s on %s' % (sender, short_id, repository)
+                text = '%s commented on commit %s/%s' % (sender, repository, short_id)
             ###
             elif event == 'ping':
                 text = '%s added a webhook for %s' % (sender, repository)
             ###
             elif event == 'issues':
                 if data['action'] == 'opened': # Creation d'une issue
-                    text = '%s opened the issue %s on %s: %s' \
+                    text = '%s opened issue %s on %s: %s' \
                         % (sender, issue, repository, issue_title)
 
                 elif data['action'] == 'labeled': # Ajout de labels
@@ -238,21 +238,21 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                         % (sender, issue, repository)
 
                 elif data['action'] == 'assigned': # Assignation de quelqu'un
-                    text = '%s assigned %s on the issue %s on %s' \
+                    text = '%s assigned %s on issue %s on %s' \
                         % (sender, assignee, issue, repository)
 
                 elif data['action'] == 'closed': # Fermeture
-                    text = '%s closed the issue %s on %s' \
+                    text = '%s closed issue %s on %s' \
                         % (sender, issue, repository)
 
                 elif data['action'] == 'reopened': # Reouverture
-                    text = '%s reopened the issue %s on %s' \
+                    text = '%s reopened issue %s on %s' \
                         % (sender, issue, repository)
                 else:
                     text = 'I received some data on an issue, that i\'m not able to parse :('
             ###
             elif event == 'issue_comment':
-                text = '%s answered to the issue %s on %s' \
+                text = '%s answered to issue %s on %s' \
                     % (sender, issue, repository)
             ###
             elif event == 'watch':
