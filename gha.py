@@ -271,6 +271,11 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             elif event == 'member':
                 text = '%s added %s as collaborator for %s' % (sender, member, repository)
             ###
+            elif event == 'gollum':
+                text = '%s updated the wiki of %s\n' % (sender, repository)
+                for page in data['pages']:
+                    text += '[%s] %s\n' % (page['action'], page['title'])
+            ###
             else:
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###
