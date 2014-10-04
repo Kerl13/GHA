@@ -79,6 +79,11 @@ Look for the « Add webhook » button.
 * The select your webhooks. GHA doesn't support everything, but it'll improve (i promise !)
 * Aaaand… click on « Add webhook » :)
 
+You can also use the `hooker.py` script. It'll try to help you adding your webhooks.  
+**Be carefull with scripts that want to access to your credentials !**
+
+Simply run `python hooker.py` and answer to his questions.
+
 
 Why this script ?
 -----------------
