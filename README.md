@@ -15,6 +15,8 @@ Installation
 Just copy the files to some place (or clone this repository).
 You also need to install Bottle (http://bottlepy.org).
 That can be done with `pip install bottle`.
+There's also a version of Bottle in the repository.
+So you can just rename Bottle-version.py into Bottle.py.
 
 
 Utilisation
@@ -25,8 +27,9 @@ Utilisation
 The python script needs some parameters, that you can get *via* `python gha.py --help`.
 
     usage: gha.py [-h] [-gh GH_HOST] [-gp GH_PORT] [-ih IRC_HOST] [-ip IRC_PORT]
-              [-ic [IRC_CHANS [IRC_CHANS ...]]] [-in IRC_NAME]
-    
+                  [-ic [IRC_CHANS [IRC_CHANS ...]]] [-in IRC_NAME] [-ea FILE]
+                  [-ia FILE]
+
     optional arguments:
       -h, --help            show this help message and exit
       -gh GH_HOST, --gh-host GH_HOST
@@ -41,12 +44,29 @@ The python script needs some parameters, that you can get *via* `python gha.py -
                             the irc channels
       -in IRC_NAME, --irc-name IRC_NAME
                             the bot's name
+      -ea FILE, --export-arguments FILE
+                            export arguments in the given file
+      -ia FILE, --import-arguments FILE
+                            import arguments from the given file
 
 For example :
 
     python gha.py --gh-host some.place.com --gh-port 4242 \
         --irc-host irc.freenode.net --irc-port 6667 \
         --irc-chans '#oneChan' '#oneOtherChan' --irc-name MyIRCBot
+
+If you want to re-use several times the same config, you should save it in a file :
+
+    python gha.py -gh some.place.com ... -in MyIRCBot --export-arguments my_file.cnf
+
+After that, you only need to import your arguments from this file :
+
+    python gha.py --import-arguments my_file.cnf
+
+And you can override the file arguments with yours :
+
+    python gha.py -ia my_file.cnf --gp 4224
+
 
 ### GitHub's side
 
