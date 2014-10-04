@@ -197,6 +197,9 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             try:
                 forkee = colorize(red, data['forkee']['full_name'])
             except: pass
+            try:
+                member = colorize(cyan, data['member']['login'])
+            except: pass
             text = ''
             ###
             if event == 'push':
@@ -264,6 +267,9 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             ###
             elif event == 'fork':
                 text = '%s forked %s to %s' % (sender, repository, forkee)
+            ###
+            elif event == 'member':
+                text = '%s added %s as collaborator for %s' % (sender, member, repository)
             ###
             else:
                 text = 'I received a %s event, and i\'m not able to parse it :(' % event

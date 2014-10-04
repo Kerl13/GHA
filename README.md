@@ -133,7 +133,7 @@ TODO
 | **Done** | Watch                       | User watches a repository.                                       |
 | **Done** | Fork                        | Repository forked.                                               |
 |          | Public                      | Repository changes from private to public.                       |
-|          | Member                      | Collaborator added to a non-organization repository.             |
+| **Done** | Member                      | Collaborator added to a non-organization repository.             |
 |          | Team add                    | Team added or modified on a repository.                          |
 |          | Release                     | Release published in a repository.                               |
 |          | Gollum                      | Wiki page updated.                                               |
