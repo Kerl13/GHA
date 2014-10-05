@@ -86,8 +86,11 @@ if errors:
 
 
 ################################################################################
-colorize = lambda c, s: '%c%c%d%s%c%c' % (2, 3, c, s, 3, 2)
-col = colorize
+def colorize (color, string):
+    if color == 'bold':
+        return '%c%s%c' % (2, string, 2)
+    else:
+        return '%c%c%d%s%c%c' % (2, 3, color, string, 3, 2)
 gray   = 14
 pink   = 13
 blue   = 12
@@ -97,7 +100,7 @@ yellow = 7
 red    = 5
 black  = 1
 white  = 15
-
+bold = 'bold'
 
 ################################################################################
 class BottleThread(multiprocessing.Process):
@@ -159,16 +162,24 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             event, data = self.queue.get_nowait()
             data = loads(data)
             ###
-            try: pusher = colorize(cyan, data['pusher']['name'])
-            except: pass
-            try: sender = colorize(cyan, data['sender']['login'])
-            except: pass
-            try: repository = colorize(pink, data['repository']['full_name'])
-            except: pass
+            def try_colorize (color, keys):
+                value = data
+                keys.reverse()
+                try:
+                    while len(keys) > 0:
+                        value = value[keys.pop()]
+                    return colorize(color, value)
+                except:
+                    return '[try_colorize failed]'
+            pusher = try_colorize(cyan, ['pusher', 'name'])
+            sender = try_colorize(cyan, ['sender', 'login'])
+            repository = try_colorize(pink, ['repository', 'full_name'])
+            
             try:
-                commit_number = '%c%d%c commit' % (2, len(data['commits']), 2)
+                commit_number = colorize(bold, len(data['commits'])) + ' commit'
                 if len(data['commits'])>1: commit_number += 's'
             except: pass
+
             try: branch = colorize(red, data['ref'].split('/').pop())
             except: pass
             try:
@@ -178,30 +189,23 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                                      colorize(cyan, commit['author']['name']),
                                      commit['message'].split('\n')[0] ))
             except: pass
+            
             try: short_id = colorize(gray, data['comment']['commit_id'][:7])
             except: pass
             try: issue = colorize(gray, '#%d' % data['issue']['number'])
             except: pass
             try: issue_title = data['issue']['title']
             except: pass
-            try: assignee = colorize(cyan, data['issue']['assignee']['login'])
-            except: pass
-            try: assignee = colorize(cyan, data['assignee']['login'])
-            except: pass
-            try: forkee = colorize(red, data['forkee']['full_name'])
-            except: pass
-            try: member = colorize(cyan, data['member']['login'])
-            except: pass
+            assignee = try_colorize(cyan, ['issue', 'assignee', 'login'])
+            assignee = try_colorize(cyan, ['assignee', 'login'])
+            forkee = try_colorize(red, ['forkee', 'full_name'])
+            member = try_colorize(cyan, ['member', 'login'])
             try: pull_request = colorize(gray, '#%d' % data['pull_request']['number'])
             except: pass
-            try: pull_base = colorize(red, data['pull_request']['base']['ref'])
-            except: pass
-            try: pull_head = colorize(red, data['pull_request']['head']['ref'])
-            except: pass
-            try: position = colorize(gray, str(data['comment']['position']))
-            except: pass
-            try: path = '%c%s%c' % (2, data['comment']['path'], 2)
-            except: pass
+            pull_base = try_colorize(red, ['pull_request', 'base', 'ref'])
+            pull_head = try_colorize(red, ['pull_request', 'head', 'ref'])
+            position = try_colorize(gray, ['comment', 'position'])
+            path = try_colorize(bold, ['comment', 'path'])
             text = ''
             ###
             if event == 'push':
