@@ -159,21 +159,17 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             event, data = self.queue.get_nowait()
             data = loads(data)
             ###
-            try:
-                pusher = colorize(cyan, data['pusher']['name'])
+            try: pusher = colorize(cyan, data['pusher']['name'])
             except: pass
-            try:
-                sender = colorize(cyan, data['sender']['login'])
+            try: sender = colorize(cyan, data['sender']['login'])
             except: pass
-            try:
-                repository = colorize(pink, data['repository']['full_name'])
+            try: repository = colorize(pink, data['repository']['full_name'])
             except: pass
             try:
                 commit_number = '%c%d%c commit' % (2, len(data['commits']), 2)
                 if len(data['commits'])>1: commit_number += 's'
             except: pass
-            try:
-                branch = colorize(red, data['ref'].split('/').pop())
+            try: branch = colorize(red, data['ref'].split('/').pop())
             except: pass
             try:
                 commits = []
@@ -182,23 +178,29 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                                      colorize(cyan, commit['author']['name']),
                                      commit['message'].split('\n')[0] ))
             except: pass
-            try:
-                short_id = colorize(gray, data['comment']['commit_id'][:7])
+            try: short_id = colorize(gray, data['comment']['commit_id'][:7])
             except: pass
-            try:
-                issue = colorize(gray, '#%d' % data['issue']['number'])
+            try: issue = colorize(gray, '#%d' % data['issue']['number'])
             except: pass
-            try:
-                issue_title = data['issue']['title']
+            try: issue_title = data['issue']['title']
             except: pass
-            try:
-                assignee = colorize(cyan, data['issue']['assignee']['login'])
+            try: assignee = colorize(cyan, data['issue']['assignee']['login'])
             except: pass
-            try:
-                forkee = colorize(red, data['forkee']['full_name'])
+            try: assignee = colorize(cyan, data['assignee']['login'])
             except: pass
-            try:
-                member = colorize(cyan, data['member']['login'])
+            try: forkee = colorize(red, data['forkee']['full_name'])
+            except: pass
+            try: member = colorize(cyan, data['member']['login'])
+            except: pass
+            try: pull_request = colorize(gray, '#%d' % data['pull_request']['number'])
+            except: pass
+            try: pull_base = colorize(red, data['pull_request']['base']['ref'])
+            except: pass
+            try: pull_head = colorize(red, data['pull_request']['head']['ref'])
+            except: pass
+            try: position = colorize(gray, str(data['comment']['position']))
+            except: pass
+            try: path = '%c%s%c' % (2, data['comment']['path'], 2)
             except: pass
             text = ''
             ###
@@ -215,7 +217,7 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 elif data['ref_type'] == 'tag':
                     text = '%s created tag %s at %s' % (sender, branch, repository)
                 else:
-                    text = 'Not implemented. event=create, ref_type='+data['ref_type']
+                    text = '[Not Implemented] event=create, ref_type='+data['ref_type']
             ###
             elif event == 'delete':
                 if data['ref_type'] == 'branch':
@@ -223,7 +225,34 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                 elif data['ref_type'] == 'tag':
                     text = '%s deleted tag %s at %s' % (sender, branch, repository)
                 else:
-                    text = 'Not implemented. event=delete, ref_type='+data['ref_type']
+                    text = '[Not Implemented] event=delete, ref_type='+data['ref_type']
+            ###
+            elif event == 'pull_request':
+                if data['action'] == 'opened':
+                    text = '%s opened pull request %s on %s to merge %s into %s' \
+                        % (sender, pull_request, repository,
+                           pull_head, pull_base)
+                elif data['action'] == 'labeled':
+                    text = '%s labeled pull request %s on %s' \
+                        % (sender, pull_request, repository)
+                elif data['action'] == 'assigned':
+                    text = '%s assigned %s on pull request %s on %s' \
+                        % (sender, assignee, pull_request, repository)
+                elif data['action'] == 'unassigned':
+                    text = '%s unassigned %s on pull request %s on %s' \
+                        % (sender, assignee, pull_request, repository)
+                elif data['action'] == 'closed':
+                    text = '%s closed pull request %s on %s' \
+                        % (sender, pull_request, repository)
+                elif data['action'] == 'reopened':
+                    text = '%s reopened pull request %s on %s' \
+                        % (sender, pull_request, repository)
+                else:
+                    text = '[Not Implemented] event=pull_request, action='+data['action']
+            ###
+            elif event == 'pull_request_review_comment':
+                text = '%s commented in pull request %s file %s line %s' \
+                    % (sender, pull_request, path, position)
             ###
             elif event == 'commit_comment':
                 text = '%s commented on commit %s/%s' % (sender, repository, short_id)
