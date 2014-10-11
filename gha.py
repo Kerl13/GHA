@@ -234,8 +234,8 @@ class PrinterBot(ircbot.SingleServerIRCBot):
             elif event == 'pull_request':
                 if data['action'] == 'opened':
                     text = '%s opened pull request %s on %s to merge %s into %s' \
-                        % (sender, pull_request, repository,
-                           pull_head, pull_base)
+                           % (sender, pull_request, repository,
+                              pull_head, pull_base)
                 elif data['action'] == 'labeled':
                     text = '%s labeled pull request %s on %s' \
                         % (sender, pull_request, repository)
@@ -250,6 +250,9 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                         % (sender, pull_request, repository)
                 elif data['action'] == 'reopened':
                     text = '%s reopened pull request %s on %s' \
+                        % (sender, pull_request, repository)
+                elif data['action'] == 'synchronize':
+                    text = '%s synchronized pull request %s on %s' \
                         % (sender, pull_request, repository)
                 else:
                     text = '[Not Implemented] event=pull_request, action='+data['action']
