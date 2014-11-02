@@ -35,6 +35,26 @@ def set_level (level):
         _LEVEL = int(level)
 
 #
+def level_of_string (string):
+    if string == 'DEBUG':
+        return DEBUG
+    elif string == 'WARNING':
+        return WARNING
+    elif string == 'ERROR':
+        return ERROR
+
+#
+def string_of_level (level):
+    if level == DEBUG:
+        return 'DEBUG'
+    elif level == WARNING:
+        return 'WARNING'
+    elif level == ERROR:
+        return 'ERROR'
+    else:
+        return ''
+
+#
 def _test (level):
     return level >= get_level()
 
@@ -48,5 +68,4 @@ def _string (string, level=None):
 #
 def prnt (string, level=None):
     if _test(level):
-        print '%s %s' % (get_level(True), string)
-
+        print '%s %s' % (string_of_level(level), string)
