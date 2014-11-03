@@ -138,3 +138,4 @@ TODO
 |          | Release                     | Release published in a repository.                               |
 |          | Gollum                      | Wiki page updated.                                               |
 |          | Page build                  | Pages site built.                                                |
+|          | Ping                        |                                                                  |
