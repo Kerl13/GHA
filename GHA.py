@@ -9,7 +9,8 @@ from sys import argv
 
 from FrontBot import *
 from HooksHandler import *
-from HooksToText import *
+
+from json import loads, dumps
 
 
 DESCRIPTION = '''GitHub Announcer
@@ -75,22 +76,23 @@ if not ARGS.gh_host:
     V.prnt('No GitHub Host given. Using localhost.', V.WARNING)
     ARGS.gh_host = 'localhost'
 
-if not 'gh-port' in ARGS:
+if not ARGS.gh_port:
     V.prnt('No GitHub Port given. Using 80.', V.WARNING)
     ARGS.gh_port = 80
 
-if not 'irc-host' in ARGS:
+if not ARGS.irc_host:
     V.prnt('No IRC Host given. Using localhost.', V.WARNING)
     ARGS.irc_host = 'localhost'
 
-if not 'irc-port' in ARGS:
+if not ARGS.irc_port:
     V.prnt('No IRC Port given. Using 6667.', V.WARNING)
     ARGS.irc_port = 6667
 
-if not 'irc-chans' in ARGS:
+if not ARGS.irc_chans:
     V.prnt('No IRC Chans given.', V.WARNING)
+    ARGS.irc_chans = []
 
-if not 'irc-name' in ARGS:
+if not ARGS.irc_name:
     V.prnt('No IRC Name given. Using GHA.', V.WARNING)
     ARGS.irc_name = 'GHA'
 
@@ -99,7 +101,7 @@ if not 'irc-name' in ARGS:
 hooks_queue = Queue ()
 text_queue = Queue ()
 
-HooksHandlerThread(ARGS.gh_host, ARGS.gh_port, hooks_queue).start()
+HooksHandlerThread(ARGS.gh_host, ARGS.gh_port, [hooks_queue]).start()
 
 F = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
 FrontBotThread(F).start()
