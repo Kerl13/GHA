@@ -3,7 +3,9 @@
 
 import V
 import ircbot
-from Queue import Queue, Empty
+import irclib
+#from multiprocessing import Queue
+from Queue import Empty
 
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
@@ -19,20 +21,32 @@ make him kicked, which is not the aim ;)
 TIME_BETWEEN_MESSAGES = 1
 
 
-class PrinterBot(ircbot.SingleServerIRCBot):
+'''
+Time between queue checks in seconds.
+The bot has to be present on IRC, so we can't just wait for something to come
+into the queue.
+So it'll only check queue regularly, and you can here define the time between
+these checks.
+'''
+TIME_BETWEEN_QUEUE_CHECKS  = 0.1
+
+
+class FrontBot(ircbot.SingleServerIRCBot):
 
     '''
-    An IRC bot whose job is to print messages on IRC.
-    You just need to init this bot, and to start it.
-    After this, you'll have access to a PrinterBot.prnt method allowing
-    you to print messages.
+    This IRC bot's job is only to be an interface between IRC and a python script.
+    It communicates through self for multiprocessing queues, so that you can safely
+    use threads.
+    Since the IRC bot is busy communicating with the IRC server, you can't just
+    call one of his methods. You have to put a dictionnary {'method', 'args'} in
+    (one of) the input queues, and the bot will do the job.
     '''
 
     def _vprnt(self, string, level):
-        V.prnt('[PrinterBot %s]' % (self.name, string), level)
+        V.prnt('[PrinterBot %s] %s' % (self.name, string), level)
 
 
-    def __init__(self, server, port, chans, name):
+    def __init__(self, server='localhost', port=6667, chans=[], name='FrontBot'):
         ircbot.SingleServerIRCBot.__init__(self, [(server, port)], name, name, 10)
         self.chans = chans
         self.name = name
@@ -114,10 +128,24 @@ class PrinterBot(ircbot.SingleServerIRCBot):
         '''
         self._vprnt('deleting chan %s' % (chan,), V.DEBUG)
         if chan in self.chans:
+            pass
             # PARTIR DU CANAL
             # SUPPRIMER L'ENTRÉE DU DICTIONNAIRE
         else:
             self._vprnt('chan %s is not in chan list (%s)' \
                         % (chan, ', '.join(self.chans)),
                         V.WARNING)
+
+
+    def _check_queue(self, queue):
+        try:
+            e = queue.get_nowait()
+            self.getattr(e['method'])(e['args'])
+        except Empty:
+            pass
+        except:
+            self._vprnt('_check_queue: Uncaught exception', V.ERROR) # AJOUTER DES DETAILS
+        irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_QUEUE_CHECKS,
+                                                self._check_queue, (queue,))
+
 
