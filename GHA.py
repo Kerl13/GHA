@@ -6,11 +6,12 @@ V = V(V.DEBUG) # A CHANGER PLUS TARD
 
 import argparse
 from sys import argv
+from json import loads, dumps
 
 from FrontBot import *
 from HooksHandler import *
 
-from json import loads, dumps
+from GitHubHooks import *
 
 
 DESCRIPTION = '''GitHub Announcer
@@ -112,6 +113,13 @@ def irc_prnt (message):
 
 while True:
     (headers, body) = hooks_queue.get()
-    irc_prnt (dumps(headers, indent=4))
-    irc_prnt (body)
 
+    if 'X-Github-Event' in headers.keys():
+        try:
+            getattr(GitHubHooks, headers['X-Github-Event']) (headers, body)
+        except:
+            V.prnt('Not implemented: event = %s' % headers['X-Github-Event'],
+                   V.ERROR)
+
+    else:
+        V.prnt('Received invalid request.', V.WARNING)
