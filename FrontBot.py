@@ -6,8 +6,9 @@ V = V(V.DEBUG)   # A CHANGER PLUS TARD
 
 import ircbot
 import irclib
-#from multiprocessing import Queue
+from multiprocessing import Process, Queue
 from Queue import Empty
+from traceback import format_exc
 
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
@@ -45,24 +46,29 @@ class FrontBot(ircbot.SingleServerIRCBot):
     '''
 
     def _vprnt(self, string, level):
-        V.prnt('[PrinterBot %s] %s' % (self.name, string), level)
+        V.prnt('[FrontBot %s] %s' % (self.name, string), level)
 
 
-    def __init__(self, server='localhost', port=6667, chans=[], name='FrontBot'):
+    def __init__(self, server = 'localhost', port = 6667, chans = [], name = 'FrontBot',
+                 input_queues = [], output_queues = []):
         ircbot.SingleServerIRCBot.__init__(self, [(server, port)], name, name, 10)
         self.chans = chans
         self.name = name
+        self.input_queues = input_queues
+        self.output_queues = output_queues
         self._vprnt('init on %s/%d : %s' % (server, port, ', '.join(chans)), V.DEBUG)
 
 
     def on_welcome(self, serv, ev):
-        self._vprnt('welcomed' % (self.name,), V.DEBUG)
+        self._vprnt('welcomed', V.DEBUG)
         self.serv = serv
-        self.queues = {}
+        self.chan_queues = {}
         for chan in self.chans:
             self.serv.join(chan)
-            self.queues[chan] = Queue()
-        self.routine()
+            self.chan_queues[chan] = Queue()
+            self._prnt(chan)
+        for input_queue in self.input_queues:
+            self._check_queue(input_queue)
 
 
     def on_pubmsg(self, serv, ev):
@@ -80,14 +86,16 @@ class FrontBot(ircbot.SingleServerIRCBot):
 
     def _prnt(self, chan):
         try:
-            line = self.queues[chan].get_nowait()
+            line = self.chan_queues[chan].get_nowait()
             self.serv.privmsg(chan, line)
-            irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_MESSAGES,
-                                                    self._prnt, (chan,))
         except Empty:
             pass
         except:
-            self._vprnt('_prnt: Uncaught exception', V.ERROR) # AJOUTER DES DETAILS
+            self._vprnt('_prnt: Uncaught exception', V.ERROR)
+            for line in format_exc().split('\n'):
+                self._vprnt(line, V.ERROR)
+        irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_MESSAGES,
+                                                self._prnt, (chan,))
 
 
     def prnt(self, message, chans=None):
@@ -98,12 +106,10 @@ class FrontBot(ircbot.SingleServerIRCBot):
         '''
         if chans == None:
             chans = self.chans
+        self._vprnt('prnt: "%s" on %s' % (message, ', '.join(chans)), V.DEBUG)
         for chan in chans:
-            empty = self.queues[chan].empty()
             for line in message.split('\n'):
-                self.queues[chan].put(line)
-            if empty:
-                self._prnt(chan)
+                self.chan_queues[chan].put(line)
 
 
     def add_chan(self, chan):
@@ -115,7 +121,8 @@ class FrontBot(ircbot.SingleServerIRCBot):
         self._vprnt('adding chan %s' % (chan,), V.DEBUG)
         if chan not in self.chans:
             self.serv.join(chan)
-            self.queues[chan] = Queue()
+            self.chan_queues[chan] = Queue()
+            self._prnt(chan)
         else:
             self._vprnt('chan %s already in chan list (%s)' \
                         % (chan, ', '.join(self.chans)),
@@ -142,12 +149,37 @@ class FrontBot(ircbot.SingleServerIRCBot):
     def _check_queue(self, queue):
         try:
             e = queue.get_nowait()
-            self.getattr(e['method'])(e['args'])
+            self._vprnt('_check_queue: Command %s with arguments %s' \
+                            % (e[0], str(e[1])),
+                        V.DEBUG)
+            getattr(self, e[0])(*e[1])
         except Empty:
             pass
         except:
-            self._vprnt('_check_queue: Uncaught exception', V.ERROR) # AJOUTER DES DETAILS
+            self._vprnt('_check_queue: Uncaught exception', V.ERROR)
+            for line in format_exc().split('\n'):
+                if line:
+                    self._vprnt(line, V.ERROR)
         irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_QUEUE_CHECKS,
                                                 self._check_queue, (queue,))
 
+
+
+class FrontBotThread(Process):
+
+    '''
+    A little Thread class allowing you to run your FrontBot encapsulated in
+    a Thread. Create a bot, give him some multiprocessing.Queues in order to
+    be able to communicate with hime. Then, create a FrontBotThread with the
+    FrontBot as argument.
+    If F is your FrontBot, you could simply do something like that:
+    FrontBotThread(F).start().
+    '''
+
+    def __init__(self, bot):
+        Process.__init__(self)
+        self.bot = bot
+
+    def run(self):
+        self.bot.start()
 
