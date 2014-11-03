@@ -29,7 +29,7 @@ class HooksHandlerThread(Process):
                 headers_dict[key] = value
             body = request.body.read()
             for queue in self.queues:
-                queue.put((headers, body))
+                queue.put((headers_dict, body))
             return ''
 
         try:
