@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import V
+from Prnt import V
+V = V()
+
 import ircbot
 import irclib
 #from multiprocessing import Queue
