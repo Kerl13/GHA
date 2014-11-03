@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from Prnt import V
-V = V()
+V = V(V.DEBUG) # A CHANGER PLUS TARD
 
 import argparse
 from sys import argv
+
+from FrontBot import *
+from HooksHandler import *
+from HooksToText import *
 
 
 DESCRIPTION = '''GitHub Announcer
@@ -64,7 +68,7 @@ if ARGS.import_arguments:
         exit(1)
 
 if ARGS.export_arguments:
-    open(ARGS.export_arguments, 'w+').write(dumps(ARGS.export_arguments))
+    open(ARGS.export_arguments, 'w+').write(dumps(ARGS.export_arguments, indent=4))
     exit(0)
 
 if not ARGS.gh_host:
@@ -91,6 +95,21 @@ if not 'irc-name' in ARGS:
     ARGS.irc_name = 'GHA'
 
 
-V.prnt('OK.')
-print 'OK...'
-exit(0)
+
+hooks_queue = Queue ()
+text_queue = Queue ()
+
+HooksHandlerThread(ARGS.gh_host, ARGS.gh_port, hooks_queue).start()
+
+F = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
+FrontBotThread(F).start()
+
+def irc_prnt (message):
+    text_queue.put(('prnt', (message, None)))
+
+
+while True:
+    (headers, body) = hooks_queue.get()
+    irc_prnt (dumps(headers, indent=4))
+    irc_prnt (body)
+
