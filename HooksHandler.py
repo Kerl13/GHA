@@ -20,7 +20,7 @@ class HooksHandlerThread(Process):
         V.prnt('[HooksHandler] ignited on %s/%s' % (host, port), V.DEBUG)
 
     def run(self):
-        @self.app.route('/')#, method='POST')
+        @self.app.route('/', method='POST')
         def index():
             V.prnt('[HooksHandler] Received request', V.DEBUG)
             headers_list = request.headers.items()
