@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Prnt import V
-V = V(V.DEBUG) # A CHANGER PLUS TARD
+V = V(V.WARNING)
 
 import argparse
 from sys import argv
@@ -63,15 +63,19 @@ ARGS = parser.parse_args()
 
 if ARGS.import_arguments:
     try:
-        ARGS = loads(open(ARG.import_arguments).read())
+        args = loads(open(ARGS.import_arguments).read())
+        for arg in [ s for s in dir(ARGS) if s[0] != '_' ]:
+            if arg in args and not getattr(ARGS, arg):
+                setattr(ARGS, arg, args[arg])
     except IOError:
         V.prnt('The file %s were not found' % (ARGS.import_arguments),
                V.ERROR)
         exit(1)
 
-if ARGS.export_arguments:
-    open(ARGS.export_arguments, 'w+').write(dumps(ARGS.export_arguments, indent=4))
-    exit(0)
+if not ARGS.verbose_level:
+    V.level = V.WARNING
+    V.prnt('No verbose level given. Using WARNING.', V.WARNING)
+    ARGS.verbose_level = 'WARNING'
 
 if not ARGS.gh_host:
     V.prnt('No GitHub Host given. Using localhost.', V.WARNING)
@@ -96,6 +100,13 @@ if not ARGS.irc_chans:
 if not ARGS.irc_name:
     V.prnt('No IRC Name given. Using GHA.', V.WARNING)
     ARGS.irc_name = 'GHA'
+
+if ARGS.export_arguments:
+    args = {}
+    for arg in [ s for s in dir(ARGS) if s[0] != '_' ]:
+        args[arg] = getattr(ARGS, arg)
+    open(ARGS.export_arguments, 'w+').write(dumps(args, indent=4))
+    exit(0)
 
 
 
