@@ -313,7 +313,8 @@ class PrinterBot(ircbot.SingleServerIRCBot):
                     text += '[%s] %s\n' % (page['action'], page['title'])
             ###
             else:
-                text = 'I received a %s event, and i\'m not able to parse it :(' % event
+                text = ''
+#                text = 'I received a %s event, and i\'m not able to parse it :(' % event
             ###
             self.prnt(text)
         
