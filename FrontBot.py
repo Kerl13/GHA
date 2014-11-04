@@ -182,3 +182,105 @@ class FrontBotThread(Process):
     def run(self):
         self.bot.start()
 
+
+
+class Color:
+
+    '''
+    A little class for IRC colors.
+    '''
+
+    #           = 14
+    #           = 15
+    #           = 16
+    gray        = 17
+    blue        = 18
+    green       = 19
+    orange      = 20
+    red         = 21
+    purple      = 22
+    brown       = 23
+    yellow      = 24
+    light_green = 25
+    #           = 26
+    cyan        = 27
+    #           = 28
+    pink        = 29
+        
+    bold   = 'bold'
+
+    def _colorize(self, color, string):
+        if color == 'bold':
+            return '%c%s%c' % (2, string, 2)
+        else:
+            return '%c%d%c%s%c%c' % (3, color, 2, string, 2, 3)
+
+    # Please, I want to do that dynamically =(
+
+    def Red (self, string, bold=True):
+        c = self._colorize(self.red, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Purple (self, string, bold=True):
+        c = self._colorize(self.purple, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Pink (self, string, bold=True):
+        c = self._colorize(self.pink, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Orange (self, string, bold=True):
+        c = self._colorize(self.orange, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def LightGreen (self, string, bold=True):
+        c = self._colorize(self.light_green, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Green (self, string, bold=True):
+        c = self._colorize(self.green, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Gray (self, string, bold=True):
+        c = self._colorize(self.gray, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Cyan (self, string, bold=True):
+        c = self._colorize(self.cyan, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Brown (self, string, bold=True):
+        c = self._colorize(self.brown, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Bold (self, string, bold=True):
+        c = self._colorize(self.bold, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def Blue (self, string, bold=True):
+        c = self._colorize(self.blue, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+C = Color()

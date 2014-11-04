@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
-class V:
+class Prnt:
 
     '''
-    The V class is a little class made to help printing leveled messages.
+    The Prnt class is a little class made to help printing leveled messages.
     You define some levels (by default, DEBUG, WARNING and ERROR), and give
     the level you currently have).
-    Then you can print (using V.prnt) messages with a given level, and it'll
+    Then you can print (using Prnt.prnt) messages with a given level, and it'll
     appear or not depending on the level previously given.
     '''
 
@@ -74,3 +74,7 @@ class V:
     def prnt (self, string, level = None):
         if self.test(level):
             print '%s %s' % (self.string_of_level(level), string)
+
+
+
+V = Prnt ()

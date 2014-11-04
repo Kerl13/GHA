@@ -125,10 +125,7 @@ while True:
     (headers, body) = hooks_queue.get()
 
     if 'X-Github-Event' in headers.keys():
-        getattr(GitHubHooks, headers['X-Github-Event']) (headers, loads(body))
-        #except:
-        #    V.prnt('Not implemented: event = %s' % headers['X-Github-Event'],
-        #           V.ERROR)
+        text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
 
     else:
         V.prnt('Received invalid request.', V.WARNING)

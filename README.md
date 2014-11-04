@@ -119,7 +119,7 @@ TODO
 
 | Status   | Event                       | Comment                                                          |
 |----------|-----------------------------|------------------------------------------------------------------|
-|          | Push                        | Git push to a repository.                                        |
+| **Done** | Push                        | Git push to a repository.                                        |
 |          | Create                      | Branch, or tag created.                                          |
 |          | Delete                      | Branch or tag deleted.                                           |
 |          | Status                      | Commit status updated from the API.                              |
