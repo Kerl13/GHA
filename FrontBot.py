@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Prnt import V
-V = V(V.DEBUG)   # A CHANGER PLUS TARD
+from Prnt import *
 
 import ircbot
 import irclib

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Prnt import V
-V = V(V.WARNING)
+from Prnt import *
 
 import argparse
 from sys import argv
