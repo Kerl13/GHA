@@ -10,7 +10,7 @@ from json import loads, dumps
 from FrontBot import *
 from HooksHandler import *
 
-from GitHubHooks import *
+from GithubHooks import *
 
 
 DESCRIPTION = '''GitHub Announcer
@@ -125,7 +125,7 @@ while True:
     (headers, body) = hooks_queue.get()
 
     if 'X-Github-Event' in headers.keys():
-        text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
+        text_queue.put(('prnt', (GithubHooks.handle(headers, body),)))
 
     else:
         V.prnt('Received invalid request.', V.WARNING)

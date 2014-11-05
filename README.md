@@ -120,22 +120,22 @@ TODO
 | Status   | Event                       | Comment                                                          |
 |----------|-----------------------------|------------------------------------------------------------------|
 | **Done** | Push                        | Git push to a repository.                                        |
-|          | Create                      | Branch, or tag created.                                          |
-|          | Delete                      | Branch or tag deleted.                                           |
+| **Done** | Create                      | Branch, or tag created.                                          |
+| **Done** | Delete                      | Branch or tag deleted.                                           |
 |          | Status                      | Commit status updated from the API.                              |
 |          | Deployment                  | Repository deployed.                                             |
 |          | Deployment status           | Deployment status updated from the API.                          |
-|          | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
-|          | Pull Request review comment | Pull Request diff commented on.                                  |
-|          | Commit comment              | Commit or diff commented on.                                     |
-|          | Issues                      | Issue opened, closed, assigned, or labeled.                      |
-|          | Issue comment               | Issue commented on.                                              |
+| **Done** | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
+| **Done** | Pull Request review comment | Pull Request diff commented on.                                  |
+| **Done** | Commit comment              | Commit or diff commented on.                                     |
+| **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
+| **Done** | Issue comment               | Issue commented on.                                              |
 |          | Watch                       | User watches a repository.                                       |
-|          | Fork                        | Repository forked.                                               |
-|          | Public                      | Repository changes from private to public.                       |
-|          | Member                      | Collaborator added to a non-organization repository.             |
+| **Done** | Fork                        | Repository forked.                                               |
+| **Done** | Public                      | Repository changes from private to public.                       |
+| **Done** | Member                      | Collaborator added to a non-organization repository.             |
 |          | Team add                    | Team added or modified on a repository.                          |
 |          | Release                     | Release published in a repository.                               |
-|          | Gollum                      | Wiki page updated.                                               |
+| **Done** | Gollum                      | Wiki page updated.                                               |
 |          | Page build                  | Pages site built.                                                |
 |          | Ping                        |                                                                  |
