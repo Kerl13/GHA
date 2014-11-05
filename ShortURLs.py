@@ -39,7 +39,7 @@ class ShortURLs:
             i = self.url_list.index(url)
         else:
             i = len(self.url_list)
-            self.url_list.append( url )
+            self.url_list += [url]
             self._save()
         print 'url_to_short modif', url, i
         print 'url_to_short after', self.url_list        
