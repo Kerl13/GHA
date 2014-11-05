@@ -9,9 +9,9 @@ from json import loads, dumps
 
 from FrontBot import *
 from HooksHandler import *
+from ShortURLs import *
 
 from GithubHooks import *
-
 
 DESCRIPTION = '''GitHub Announcer
 
@@ -20,13 +20,21 @@ DESCRIPTION = '''GitHub Announcer
 
 parser = argparse.ArgumentParser(description=DESCRIPTION, prog=argv[0])
 
-parser.add_argument('-gh', '--gh-host',
+parser.add_argument('-lh', '--listen-host',
                     type = str,
-                    help = 'the address where github sends the data')
+                    help = 'the address where GHA will be listening')
 
-parser.add_argument('-gp', '--gh-port',
+parser.add_argument('-lp', '--listen-port',
                     type = int,
-                    help = 'the port where github sends the data')
+                    help = 'the port where GHA will be listening')
+
+parser.add_argument('-wh', '--web-host',
+                    type = str,
+                    help = 'the address seen from outside (if you\'re behind a proxy…)')
+
+parser.add_argument('-bp', '--base-port',
+                    type = str,
+                    help = 'the port seen from outside')
 
 parser.add_argument('-ih', '--irc-host',
                     type = str,
@@ -76,13 +84,13 @@ if not ARGS.verbose_level:
     V.prnt('No verbose level given. Using WARNING.', V.WARNING)
     ARGS.verbose_level = 'WARNING'
 
-if not ARGS.gh_host:
+if not ARGS.listen_host:
     V.prnt('No GitHub Host given. Using localhost.', V.WARNING)
-    ARGS.gh_host = 'localhost'
+    ARGS.listen_host = 'localhost'
 
-if not ARGS.gh_port:
+if not ARGS.listen_port:
     V.prnt('No GitHub Port given. Using 80.', V.WARNING)
-    ARGS.gh_port = 80
+    ARGS.listen_port = 80
 
 if not ARGS.irc_host:
     V.prnt('No IRC Host given. Using localhost.', V.WARNING)
@@ -112,7 +120,11 @@ if ARGS.export_arguments:
 hooks_queue = Queue ()
 text_queue = Queue ()
 
-HooksHandlerThread(ARGS.gh_host, ARGS.gh_port, [hooks_queue]).start()
+SU = ShortURLs('http://%s:%d/' % (ARGS.web_host, ARGS.web_port), '.shorturls')
+
+GithubHooks.add_su(SU)
+
+HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, SU, [hooks_queue]).start()
 
 F = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
 FrontBotThread(F).start()

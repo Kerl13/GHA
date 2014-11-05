@@ -7,6 +7,11 @@ from Prnt import V
 
 class GithubHooks:
 
+    su = None
+
+    def add_su(self, su):
+        self.su = su
+
     def handle (self, headers, body):
         if 'X-Github-Event' in headers.keys():
             return getattr(self, headers['X-Github-Event']) (headers, loads(body))
@@ -127,7 +132,7 @@ class GithubHooks:
                                                              C.Cyan( body['pusher']['name'] ),
                                                              C.Bold( len(body['commits']) ),
                                                              C.Red( body['ref'].split('/')[-1] ),
-                                                             C.Blue( body['compare'], False ) ) # miniurl
+                                                             C.Blue( self.su.url_to_short( body['compare'] ), False ) ) # miniurl
         for commit in body['commits']:
             string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
                                         C.Cyan( commit['committer']['username'] ),

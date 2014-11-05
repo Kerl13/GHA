@@ -9,3 +9,4 @@
 # gha
 *.log
 *.cnf
+.shorturls
