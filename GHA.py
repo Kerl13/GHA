@@ -85,15 +85,23 @@ if not ARGS.verbose_level:
     ARGS.verbose_level = 'WARNING'
 
 if not ARGS.listen_host:
-    V.prnt('No GitHub Host given. Using localhost.', V.WARNING)
-    ARGS.listen_host = 'localhost'
+    V.prnt('No listen host given. Using 0.0.0.0.', V.WARNING)
+    ARGS.listen_host = '0.0.0.0'
 
 if not ARGS.listen_port:
-    V.prnt('No GitHub Port given. Using 80.', V.WARNING)
+    V.prnt('No listen port given. Using 80.', V.WARNING)
     ARGS.listen_port = 80
 
+if not ARGS.web_host:
+    V.prnt('No web host given. Using listen host.', V.WARNING)
+    ARGS.web_host = ARGS.listen_host
+
+if not ARGS.web_port:
+    V.prnt('No web port given. Using listen port.', V.WARNING)
+    ARGS.web_port = ARGS.listen_port
+
 if not ARGS.irc_host:
-    V.prnt('No IRC Host given. Using localhost.', V.WARNING)
+    V.prnt('No IRC host given. Using localhost.', V.WARNING)
     ARGS.irc_host = 'localhost'
 
 if not ARGS.irc_port:
