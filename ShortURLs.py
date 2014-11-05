@@ -34,23 +34,27 @@ class ShortURLs:
         return str(i) # to be changed
 
     def url_to_short(self, url):
+        print 'url_to_short before', self.url_list
         if url in self.url_list:
             i = self.url_list.index(url)
         else:
             i = len(self.url_list)
             self.url_list.append( url )
             self._save()
-        print 'url_to_short', url, i
+        print 'url_to_short modif', url, i
+        print 'url_to_short after', self.url_list        
         return self.base_url+self.int_to_string(i)
 
     def short_to_url(self, short, with_base_url=True):
         try:
+            print 'short_to_url before', self.url_list
             if with_base_url:
                 i = self.string_to_int( short[len(self.base_url):] )
             else:
                 i = self.string_to_int( short )
             url = self.url_list[i]
-            print 'short_to_url', i, url
+            print 'short_to_url modif', i, url
+            print 'short_to_url after', self.url_list
             return url
         except:
             return ''
