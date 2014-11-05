@@ -64,8 +64,6 @@ class FrontBot(ircbot.SingleServerIRCBot):
         self.chan_queues = {}
         for chan in self.chans:
             self.serv.join(chan)
-            self.chan_queues[chan] = Queue()
-            self._prnt(chan)
         for input_queue in self.input_queues:
             self._check_queue(input_queue)
 
@@ -107,6 +105,9 @@ class FrontBot(ircbot.SingleServerIRCBot):
             chans = self.chans
         self._vprnt('prnt: "%s" on %s' % (message, ', '.join(chans)), V.DEBUG)
         for chan in chans:
+            if chan not in self.chan_queues:
+                self.chan_queues[chan] = Queue()
+                self._prnt(chan)
             for line in message.split('\n'):
                 self.chan_queues[chan].put(line)
 

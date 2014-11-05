@@ -17,7 +17,7 @@ class ShortURLs:
         self.save_file = save_file
 
     def get_list(self):
-        return load( open(self.save_file, 'r').read() )['content']
+        return loads( open(self.save_file, 'r').read() )['content']
 
     def set_list(self, l):
         open(self.save_file, 'w+').write( dumps( {'content':l}, indent=4 ) )
@@ -30,7 +30,6 @@ class ShortURLs:
 
     def url_to_short(self, url):
         l = self.get_list()
-        print 'url_to_short before', l
         if url in l:
             i = l.index(url)
         else:
@@ -40,7 +39,6 @@ class ShortURLs:
         return self.base_url+self.int_to_string(i)
 
     def short_to_url(self, short, with_base_url=True):
-        print 'short_to_url before', self.get_list()
         if with_base_url:
             i = self.string_to_int( short[len(self.base_url):] )
         else:
