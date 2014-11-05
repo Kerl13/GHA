@@ -125,7 +125,10 @@ while True:
     (headers, body) = hooks_queue.get()
 
     if 'X-Github-Event' in headers.keys():
-        text_queue.put(('prnt', (GithubHooks.handle(headers, body),)))
+        try:
+            text_queue.put(('prnt', (GithubHooks.handle(headers, body),)))
+        except Exception, ex:
+            text_queue.put(('prnt', (str(ex), 'niols')))
 
     else:
         V.prnt('Received invalid request.', V.WARNING)
