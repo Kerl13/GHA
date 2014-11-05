@@ -130,7 +130,11 @@ if ARGS.export_arguments:
 hooks_queue = Queue ()
 text_queue = Queue ()
 
-SU = ShortURLs('http://%s:%d/' % (ARGS.web_host, ARGS.web_port), '.shorturls')
+baseurl = 'http://%s' % ARGS.web_host
+if ARGS.web_port != 80:
+    baseurl += ':%s' % ARGS.web_port
+baseurl += '/'
+SU = ShortURLs(baseurl, '.shorturls')
 
 GithubHooks.add_su(SU)
 
