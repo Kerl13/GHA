@@ -7,6 +7,11 @@ from json import loads, dumps
 
 class ShortURLs:
 
+    '''
+    This class tries to provide a URL shortener (and reverse).
+    It's not fully working atm.
+    '''
+
     def __init__(self, base_url, save_file = None):
         self.base_url = base_url
         self.save_file = save_file
