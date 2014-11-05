@@ -32,7 +32,7 @@ parser.add_argument('-wh', '--web-host',
                     type = str,
                     help = 'the address seen from outside (if you\'re behind a proxy…)')
 
-parser.add_argument('-bp', '--base-port',
+parser.add_argument('-wp', '--web-port',
                     type = str,
                     help = 'the port seen from outside')
 
