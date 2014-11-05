@@ -32,7 +32,7 @@ class Prnt:
             return self.level
 
 
-    def set_level (level):
+    def set_level (self, level):
         for l in self.get_levels().keys():
             if level == l:
                 self.level = getattr(self, l)

@@ -83,6 +83,8 @@ if not ARGS.verbose_level:
     V.level = V.WARNING
     V.prnt('No verbose level given. Using WARNING.', V.WARNING)
     ARGS.verbose_level = 'WARNING'
+else:
+    V.set_level(ARGS.verbose_level)
 
 if not ARGS.listen_host:
     V.prnt('No listen host given. Using 0.0.0.0.', V.WARNING)
