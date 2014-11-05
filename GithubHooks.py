@@ -25,7 +25,7 @@ class GithubHooks:
                                                             C.Blue( body['repository']['html_url'], False ) ) # miniurl
         else:
             return '[%s] %s created the %s %s.' % ( C.Pink( body['repository']['full_name'] ),
-                                                    C.Cyan( body['sender']['login'] )
+                                                    C.Cyan( body['sender']['login'] ),
                                                     body['ref_type'],
                                                     C.Red( body['ref'] ) )
 
