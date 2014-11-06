@@ -108,6 +108,10 @@ class GithubHooks:
         V.prnt( 'GithubHooks.page_build', V.ERROR )
         return ''
 
+    def ping (self, headers, body):
+        V.prnt( 'GithubHooks.ping', V.ERROR )
+        return ''
+
     def public (self, headers, body):
         return '[%s] %s made this repository public.' % ( C.Pink( body['repository']['full_name'] ),
                                                           C.Cyan( body['sender']['login'] ) )
