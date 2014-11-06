@@ -86,7 +86,7 @@ class GithubHooks:
     def issue_comment (self, headers, body):
         return '[%s] %s comment issue %s. (%s)' % ( C.Pink( body['repository']['full_name'] ),
                                                     C.Cyan( body['comment']['user']['login'] ),
-                                                    C.Gray( '#'+body['issue']['number'] ),
+                                                    C.Gray( '#'+str(body['issue']['number']) ),
                                                     C.Blue( body['issue']['url'], False ) ) # miniurl
 
     def issues (self, headers, body):
@@ -95,7 +95,7 @@ class GithubHooks:
                                    body['action'] )
         if body['action'] in ['assigned', 'unassigned']:
             string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
-        string += 'issue %s. (%s)' % ( C.Gray( '#'+body['issue']['number'] ),
+        string += 'issue %s. (%s)' % ( C.Gray( '#'+str(body['issue']['number']) ),
                                        C.Blue( body['issue']['url'], False ) )
         return string
 
@@ -122,13 +122,13 @@ class GithubHooks:
                                    body['action'] )
         if body['action'] in ['assigned', 'unassigned']:
             string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
-        string += 'pull request %s. (%s)' % ( C.Gray( '#'+body['pull_request']['number'] ),
+        string += 'pull request %s. (%s)' % ( C.Gray( '#'+str(body['pull_request']['number']) ),
                                               C.Blue( body['pull_request']['html_url'], False ) )
 
     def pull_request_review_comment (self, headers, body):
         return '[%s] %s commented pull request %s. (%s)' % ( C.Pink( body['repository']['full_name'] ),
                                                              C.Cyan( body['comment']['user']['login'] ),
-                                                             C.Gray( '#'+body['pull_request']['number'] ),
+                                                             C.Gray( '#'+str(body['pull_request']['number']) ),
                                                              C.Blue( body['comment']['html_url'], False ) )
 
     def push (self, headers, body):
