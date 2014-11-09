@@ -102,7 +102,7 @@ class GithubHooks:
     def member (self, headers, body):
         return '[%s] %s added %s as collaborator.' % ( C.Pink( body['repository']['full_name'] ),
                                                        C.Cyan( body['sender']['login'] ),
-                                                       C.Cyan( body['member']['octocat'] ) )
+                                                       C.Cyan( body['member']['login'] ) )
 
     def page_build (self, headers, body):
         V.prnt( 'GithubHooks.page_build', V.ERROR )
@@ -145,6 +145,18 @@ class GithubHooks:
 
     def release (self, headers, body):
         V.prnt( 'GithubHooks.release', V.ERROR )
+        return ''
+
+    def status (self, headers, body):
+        V.prnt( 'GithubHooks.status', V.ERROR )
+        return ''
+
+    def team_add (self, headers, body):
+        V.prnt( 'GithubHooks.team_add', V.ERROR )
+        return ''
+
+    def watch (self, headers, body):
+        V.prnt ('GithubHooks.watch', V.ERROR )
         return ''
 
 
