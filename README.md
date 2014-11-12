@@ -113,29 +113,33 @@ TODO
 ----
 
 * Make hooker.py more powerfull (add, remove, edit, …)
-* Make conf files more readable and modifiable for human users (\n ?)
+* Write a SCRIPTING.md (in wiki maybe)
 * Support many languages (?)
 * Support all hooks :
 
 | Status   | Event                       | Comment                                                          |
 |----------|-----------------------------|------------------------------------------------------------------|
-| **Done** | Push                        | Git push to a repository.                                        |
+| **Done** | Commit comment              | Commit or diff commented on.                                     |
 | **Done** | Create                      | Branch, or tag created.                                          |
 | **Done** | Delete                      | Branch or tag deleted.                                           |
-|          | Status                      | Commit status updated from the API.                              |
-|          | Deployment                  | Repository deployed.                                             |
-|          | Deployment status           | Deployment status updated from the API.                          |
-| **Done** | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
-| **Done** | Pull Request review comment | Pull Request diff commented on.                                  |
-| **Done** | Commit comment              | Commit or diff commented on.                                     |
+| WIP      | Deployment                  | Repository deployed.                                             |
+| WIP      | Deployment status           | Deployment status updated from the API.                          |
+|          | Download                    |                                                                  |
+|          | Follow                      |                                                                  |
+| **Done** | Fork                        | Repository forked.                                               |
+|          | Fork Apply                  |                                                                  |
+|          | Gist                        |                                                                  |
+| **Done** | Gollum                      | Wiki page updated.                                               |
 | **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
 | **Done** | Issue comment               | Issue commented on.                                              |
-|          | Watch                       | User watches a repository.                                       |
-| **Done** | Fork                        | Repository forked.                                               |
-| **Done** | Public                      | Repository changes from private to public.                       |
 | **Done** | Member                      | Collaborator added to a non-organization repository.             |
-|          | Team add                    | Team added or modified on a repository.                          |
-|          | Release                     | Release published in a repository.                               |
-| **Done** | Gollum                      | Wiki page updated.                                               |
 |          | Page build                  | Pages site built.                                                |
 |          | Ping                        |                                                                  |
+| **Done** | Public                      | Repository changes from private to public.                       |
+| **Done** | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
+| **Done** | Pull Request review comment | Pull Request diff commented on.                                  |
+| **Done** | Push                        | Git push to a repository.                                        |
+|          | Release                     | Release published in a repository.                               |
+|          | Status                      | Commit status updated from the API.                              |
+|          | Team add                    | Team added or modified on a repository.                          |
+|          | Watch                       | User watches a repository.                                       |
