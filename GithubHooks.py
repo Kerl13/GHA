@@ -19,7 +19,7 @@ class GithubHooks:
 
     def commit_comment (self, headers, body):
         return '[%s] %s commented on commit %s. (%s)' % ( C.Pink( body['repository']['full_name'] ),
-                                                          C.Cyan( body['comment']['user'] ),
+                                                          C.Cyan( body['comment']['user']['login'] ),
                                                           C.Gray( body['comment']['commit_id'][:7] ),
                                                           C.Blue( self.su.url_to_short( body['comment']['html_url'] ), False ) )
 
