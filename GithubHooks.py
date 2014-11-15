@@ -119,15 +119,18 @@ class GithubHooks:
                                                         C.Blue( self.su.url_to_short( body['comment']['html_url'] ), False ) )
 
     def push (self, headers, body):
-        string = '%s pushed %s commits to %s. (%s)' % ( C.Cyan( body['pusher']['name'] ),
-                                                        C.Bold( len(body['commits']) ),
-                                                        C.Red( body['ref'].split('/')[-1] ),
-                                                        C.Blue( self.su.url_to_short( body['compare'] ), False ) )
-        for commit in body['commits']:
-            string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
-                                        C.Cyan( commit['committer']['username'] ),
-                                        commit['message'].split('\n')[0] )
-        return string
+	if body['commits']:
+	        string = '%s pushed %s commits to %s. (%s)' % ( C.Cyan( body['pusher']['name'] ),
+        	                                                C.Bold( len(body['commits']) ),
+                	                                        C.Red( body['ref'].split('/')[-1] ),
+                        	                                C.Blue( self.su.url_to_short( body['compare'] ), False ) )
+        	for commit in body['commits']:
+            	string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
+                	                        C.Cyan( commit['committer']['username'] ),
+                        	                commit['message'].split('\n')[0] )
+	        return string
+	else:
+		return ""
 
     def release (self, headers, body):
         V.prnt( 'GithubHooks.release', V.ERROR )
