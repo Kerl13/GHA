@@ -86,9 +86,9 @@ class GithubHooks:
         return string
 
     def issue_comment (self, headers, body):
-        return '%s comment issue %s. (%s)' % ( C.Cyan( body['comment']['user']['login'] ),
-                                               C.Gray( '#'+str(body['issue']['number']) ),
-                                               C.Blue( self.su.url_to_short( body['issue']['url'] ), False ) )
+        return '%s commented issue %s. (%s)' % ( C.Cyan( body['comment']['user']['login'] ),
+                                                 C.Gray( '#'+str(body['issue']['number']) ),
+                                                 C.Blue( self.su.url_to_short( body['issue']['url'] ), False ) )
 
     def member (self, headers, body):
         return '%s added %s as collaborator.' % ( C.Cyan( body['sender']['login'] ),
