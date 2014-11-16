@@ -80,7 +80,10 @@ class GithubHooks:
         string = '%s %s ' % ( C.Cyan( body['sender']['login'] ),
                               body['action'] )
         if body['action'] in ['assigned', 'unassigned']:
-            string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
+            if body['assignee']['login'] == body['sender']['login']:
+                string += 'himself on ' # What about women ? =(
+            else:
+                string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
         string += 'issue %s. (%s)' % ( C.Gray( '#'+str(body['issue']['number']) ),
                                        C.Blue( self.su.url_to_short( body['issue']['url'] ), False ) )
         return string
