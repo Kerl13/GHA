@@ -120,7 +120,7 @@ if not ARGS.irc_name:
 
 if ARGS.export_arguments:
     args = {}
-    for arg in [ s for s in dir(ARGS) if s[0] != '_' ]:
+    for arg in [ s for s in dir(ARGS) if s[0] != '_' and s not in ['import_arguments', 'export_arguments'] ]:
         args[arg] = getattr(ARGS, arg)
     open(ARGS.export_arguments, 'w+').write(dumps(args, indent=4))
     exit(0)
