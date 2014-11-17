@@ -13,9 +13,10 @@ class GithubHooks:
         self.su = su
 
     def handle (self, headers, body):
+        body = loads (body)
         if 'X-Github-Event' in headers.keys():
             return '[%s] %s' % ( C.Pink ( body['repository']['full_name'] ),
-                                 getattr(self, headers['X-Github-Event']) (headers, loads(body)) )
+                                 getattr(self, headers['X-Github-Event']) (headers, body) )
         return ''
 
     def commit_comment (self, headers, body):

@@ -103,7 +103,7 @@ class FrontBot(ircbot.SingleServerIRCBot):
         '''
         if chans == None:
             chans = self.chans
-        self._vprnt('prnt: "%s" on %s' % (message, ', '.join(chans)), V.DEBUG)
+        self._vprnt('prnt on %s : %s' % (', '.join(chans), message), V.DEBUG)
         for chan in chans:
             if chan not in self.chan_queues:
                 self.chan_queues[chan] = Queue()
@@ -149,9 +149,6 @@ class FrontBot(ircbot.SingleServerIRCBot):
     def _check_queue(self, queue):
         try:
             e = queue.get_nowait()
-            self._vprnt('_check_queue: Command %s with arguments %s' \
-                            % (e[0], str(e[1])),
-                        V.DEBUG)
             getattr(self, e[0])(*e[1])
         except Empty:
             pass

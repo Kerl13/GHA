@@ -4,6 +4,7 @@
 from Prnt import *
 from json import loads, dumps
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+from os.path import exists, isfile
 
 class ShortURLs:
 
@@ -17,7 +18,11 @@ class ShortURLs:
         self.save_file = save_file
 
     def get_list(self):
-        return loads( open(self.save_file, 'r').read() )['content']
+        if exists(self.save_file) and isfile(self.save_file):
+            return loads( open(self.save_file, 'r').read() )['content']
+        else:
+            self.set_list([])
+            return []
 
     def set_list(self, l):
         open(self.save_file, 'w+').write( dumps( {'content':l}, indent=4 ) )
@@ -29,6 +34,7 @@ class ShortURLs:
         return urlsafe_b64encode(str(i))
 
     def url_to_short(self, url):
+        V.prnt ('[ShortURL] url_to_short: '+url, V.DEBUG)
         l = self.get_list()
         if url in l:
             i = l.index(url)
@@ -39,6 +45,7 @@ class ShortURLs:
         return self.base_url+self.int_to_string(i)
 
     def short_to_url(self, short, with_base_url=True):
+        V.prnt ('[ShortURL] short_to_url: '+short, V.DEBUG)
         if with_base_url:
             i = self.string_to_int( short[len(self.base_url):] )
         else:
