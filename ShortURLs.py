@@ -3,8 +3,34 @@
 
 from Prnt import *
 from json import loads, dumps
-from base64 import urlsafe_b64encode, urlsafe_b64decode
 from os.path import exists, isfile
+
+
+class Base:
+
+    chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+    def to_ten (self, base, num):
+        l = len (num)
+        res = 0
+        for i in range (l):
+            res += self.chars.index(num[l-1-i]) * (base ** i)
+        return str(res)
+
+    def from_ten (self, base, num):
+        num = int(num)
+        res = ''
+        while num > 0:
+            res = self.chars[num % base] + res
+            num = num / base
+        return res
+
+    def convert (self, start_base, end_base, num):
+        return self.from_ten (end_base, self.to_ten (start_base, num))
+
+Base = Base ()
+
+
 
 class ShortURLs:
 
@@ -28,10 +54,10 @@ class ShortURLs:
         open(self.save_file, 'w+').write( dumps( {'content':l}, indent=4 ) )
 
     def string_to_int(self, string):
-        return int(urlsafe_b64decode(string))
+        return int(Base.to_ten(62, string))
 
     def int_to_string(self, i):
-        return urlsafe_b64encode(str(i))
+        return Base.from_ten(62, str(i))
 
     def url_to_short(self, url):
         V.prnt ('[ShortURL] url_to_short: '+url, V.DEBUG)
