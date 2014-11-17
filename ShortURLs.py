@@ -3,7 +3,7 @@
 
 from Prnt import *
 from json import loads, dumps
-
+from base64 import urlsafe_b64encode, urlsafe_b64decode
 
 class ShortURLs:
 
@@ -23,10 +23,10 @@ class ShortURLs:
         open(self.save_file, 'w+').write( dumps( {'content':l}, indent=4 ) )
 
     def string_to_int(self, string):
-        return int(string) # to be changed
+        return int(urlsafe_b64decode(string))
 
     def int_to_string(self, i):
-        return str(i) # to be changed
+        return urlsafe_b64encode(str(i))
 
     def url_to_short(self, url):
         l = self.get_list()
