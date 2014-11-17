@@ -128,7 +128,7 @@ class GithubHooks:
                 	                                        C.Red( body['ref'].split('/')[-1] ),
                         	                                C.Blue( self.su.url_to_short( body['compare'] ), False ) )
         	for commit in body['commits']:
-            	string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
+                    string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
                 	                        C.Cyan( commit['committer']['username'] ),
                         	                commit['message'].split('\n')[0] )
 	        return string
