@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Prnt import *
 from json import loads, dumps
 from os.path import exists, isfile
 
@@ -60,7 +59,7 @@ class ShortURLs:
         return Base.from_ten(62, str(i))
 
     def url_to_short(self, url):
-        V.prnt ('[ShortURL] url_to_short: '+url, V.DEBUG)
+#        V.prnt ('[ShortURL] url_to_short: '+url, V.DEBUG)
         l = self.get_list()
         if url in l:
             i = l.index(url)
@@ -71,7 +70,7 @@ class ShortURLs:
         return self.base_url+self.int_to_string(i)
 
     def short_to_url(self, short, with_base_url=True):
-        V.prnt ('[ShortURL] short_to_url: '+short, V.DEBUG)
+#        V.prnt ('[ShortURL] short_to_url: '+short, V.DEBUG)
         if with_base_url:
             i = self.string_to_int( short[len(self.base_url):] )
         else:

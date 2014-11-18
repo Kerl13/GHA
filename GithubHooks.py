@@ -3,7 +3,7 @@
 
 from json import loads
 from FrontBot import C
-from Prnt import V
+
 
 class GithubHooks:
 
@@ -39,20 +39,20 @@ class GithubHooks:
                                            C.Red( body['ref'] ) )
 
     def deployment (self, headers, body):
-        V.prnt( 'GithubHooks.deployment', V.ERROR )
+#        # V.prnt( 'GithubHooks.deployment', V.ERROR )
         return 'The %s environment has been deployed.' % ( C.Bold( body['deployment']['environment'] ), )
 
     def deployment_status (self, headers, body):
-        V.prnt( 'GithubHooks.deployment', V.ERROR )
+        # V.prnt( 'GithubHooks.deployment', V.ERROR )
         return 'The %s environment has been deployed with %s.' % ( C.Bold( body['deployment']['environment'] ),
                                                                    C.Bold( body['deployment_status']['state'] ) )
 
     def download (self, headers, body):
-        V.prnt( 'GithubHooks.download', V.ERROR )
+        # V.prnt( 'GithubHooks.download', V.ERROR )
         return ''
 
     def follow (self, headers, body):
-        V.prnt( 'GithubHooks.follow', V.ERROR )
+        # V.prnt( 'GithubHooks.follow', V.ERROR )
         return ''
 
     def fork (self, headers, body):
@@ -60,11 +60,11 @@ class GithubHooks:
                                       C.Pink( body['forkee']['full_name'] ) )
 
     def fork_apply (self, headers, body):
-        V.prnt( 'GithubHooks.fork_apply', V.ERROR )
+        # V.prnt( 'GithubHooks.fork_apply', V.ERROR )
         return ''
 
     def gist (self, headers, body):
-        V.prnt( 'GithubHooks.gist', V.ERROR )
+        # V.prnt( 'GithubHooks.gist', V.ERROR )
         return ''
 
     def gollum (self, headers, body):
@@ -99,11 +99,11 @@ class GithubHooks:
                                                        C.Cyan( body['member']['login'] ) )
 
     def page_build (self, headers, body):
-        V.prnt( 'GithubHooks.page_build', V.ERROR )
+        # V.prnt( 'GithubHooks.page_build', V.ERROR )
         return ''
 
     def ping (self, headers, body):
-        V.prnt( 'GithubHooks.ping', V.ERROR )
+        # V.prnt( 'GithubHooks.ping', V.ERROR )
         return ''
 
     def public (self, headers, body):
@@ -137,19 +137,19 @@ class GithubHooks:
 		return ""
 
     def release (self, headers, body):
-        V.prnt( 'GithubHooks.release', V.ERROR )
+        # V.prnt( 'GithubHooks.release', V.ERROR )
         return ''
 
     def status (self, headers, body):
-        V.prnt( 'GithubHooks.status', V.ERROR )
+        # V.prnt( 'GithubHooks.status', V.ERROR )
         return ''
 
     def team_add (self, headers, body):
-        V.prnt( 'GithubHooks.team_add', V.ERROR )
+        # V.prnt( 'GithubHooks.team_add', V.ERROR )
         return ''
 
     def watch (self, headers, body):
-        V.prnt ('GithubHooks.watch', V.ERROR )
+        # V.prnt ('GithubHooks.watch', V.ERROR )
         return ''
 
 

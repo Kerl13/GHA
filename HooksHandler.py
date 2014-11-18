@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Prnt import *
-
 from multiprocessing import Process, Queue
 from Queue import Empty
 from Bottle import Bottle, request, redirect
@@ -17,12 +15,12 @@ class HooksHandlerThread(Process):
         self.short_urls = short_urls
         self.queues = queues
         self.app = Bottle()
-        V.prnt('[HooksHandler] ignited on %s/%s' % (host, port), V.DEBUG)
+        # V.prnt('[HooksHandler] ignited on %s/%s' % (host, port), V.DEBUG)
 
     def run(self):
         @self.app.route('/', method='POST')
         def index():
-            V.prnt('[HooksHandler] Received request', V.DEBUG)
+            # V.prnt('[HooksHandler] Received request', V.DEBUG)
             headers_list = request.headers.items()
             headers_dict = {}
             for key, value in headers_list:
@@ -40,5 +38,5 @@ class HooksHandlerThread(Process):
         try:
             self.app.run(host=self.host, port=self.port, quiet=True)
         except Exception, ex:
-            V.prnt('[HooksHandler] Error while starting server: '+str(ex), V.ERROR)
+            # V.prnt('[HooksHandler] Error while starting server: '+str(ex), V.ERROR)
 
