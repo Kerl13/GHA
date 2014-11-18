@@ -69,7 +69,7 @@ class FrontBot(ircbot.SingleServerIRCBot):
 
     def on_pubmsg(self, serv, ev):
 #        self._vprnt('pubmsg %s/%s: %s' % (ev.target(), ev.source(), ev.arguments()[0]),
-                    V.DEBUG)
+#                    V.DEBUG)
         if ev.arguments()[0] == self.name+': help':
             self.prnt(HELP_MESSAGE, ev.target())
 
@@ -87,9 +87,9 @@ class FrontBot(ircbot.SingleServerIRCBot):
         except Empty:
             pass
         except:
+	    pass
 #            self._vprnt('_prnt: Uncaught exception', V.ERROR)
-            for line in format_exc().split('\n'):
-                pass
+#            for line in format_exc().split('\n'):
 #                self._vprnt(line, V.ERROR)
         irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_MESSAGES,
                                                 self._prnt, (chan,))
@@ -124,9 +124,10 @@ class FrontBot(ircbot.SingleServerIRCBot):
             self.chan_queues[chan] = Queue()
             self._prnt(chan)
         else:
+	    pass
 #            self._vprnt('chan %s already in chan list (%s)' \
-                        % (chan, ', '.join(self.chans)),
-                        V.WARNING)
+#                        % (chan, ', '.join(self.chans)),
+#                        V.WARNING)
 
 
     def del_chan(self, chan):
@@ -157,6 +158,7 @@ class FrontBot(ircbot.SingleServerIRCBot):
 #            self._vprnt('_check_queue: Uncaught exception', V.ERROR)
             for line in format_exc().split('\n'):
                 if line:
+		    pass
 #                    self._vprnt(line, V.ERROR)
         irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_QUEUE_CHECKS,
                                                 self._check_queue, (queue,))

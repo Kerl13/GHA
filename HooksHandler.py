@@ -38,5 +38,6 @@ class HooksHandlerThread(Process):
         try:
             self.app.run(host=self.host, port=self.port, quiet=True)
         except Exception, ex:
+	    pass
             # V.prnt('[HooksHandler] Error while starting server: '+str(ex), V.ERROR)
 
