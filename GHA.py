@@ -78,6 +78,12 @@ if ARGS.import_arguments:
         V.prnt('The file %s were not found' % (ARGS.import_arguments),
                V.ERROR)
         exit(1)
+    except:
+        V.prnt ('Error while importing arguments from file.', V.ERROR)
+        for line in format_exc().split('\n'):
+            if line:
+                V.prnt (line, V.ERROR)
+        exit(1)
 
 if not ARGS.verbose_level:
     V.level = V.WARNING
