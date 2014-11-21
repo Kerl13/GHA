@@ -15,8 +15,11 @@ class GithubHooks:
     def handle (self, headers, body):
         body = loads (body)
         if 'X-Github-Event' in headers.keys():
-            return '[%s] %s' % ( C.Pink ( body['repository']['full_name'] ),
-                                 getattr(self, headers['X-Github-Event']) (headers, body) )
+            message = getattr(self, headers['X-Github-Event']) (headers, body);
+            if message:
+                return '[%s] %s' % ( C.Pink ( body['repository']['full_name'] ), message )
+            else:
+                return ''
         return ''
 
     def commit_comment (self, headers, body):
@@ -134,7 +137,7 @@ class GithubHooks:
                         	                commit['message'].split('\n')[0] )
 	        return string
 	else:
-		return ""
+		return ''
 
     def release (self, headers, body):
         # V.prnt( 'GithubHooks.release', V.ERROR )
