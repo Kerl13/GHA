@@ -133,7 +133,7 @@ class GithubHooks:
                         	                                C.Blue( self.su.url_to_short( body['compare'] ), False ) )
         	for commit in body['commits']:
                     string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
-                	                        C.Cyan( commit['committer']['username'] ),
+                	                        C.Cyan( commit['committer']['username'] if 'username' in commit['committer'] else commit['committer']['name'] ),
                         	                commit['message'].split('\n')[0] )
 	        return string
 	else:
