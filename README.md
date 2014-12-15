@@ -107,34 +107,3 @@ Everyone is permitted to copy and distribute verbatim or modified copies of this
 DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 You just DO WHAT THE FUCK YOU WANT TO.
-
-
-TODO
-----
-
-* Make hooker.py more powerfull (add, remove, edit, …)
-* Make conf files more readable and modifiable for human users (\n ?)
-* Support many languages (?)
-* Support all hooks :
-
-| Status   | Event                       | Comment                                                          |
-|----------|-----------------------------|------------------------------------------------------------------|
-| **Done** | Push                        | Git push to a repository.                                        |
-| **Done** | Create                      | Branch, or tag created.                                          |
-| **Done** | Delete                      | Branch or tag deleted.                                           |
-|          | Status                      | Commit status updated from the API.                              |
-|          | Deployment                  | Repository deployed.                                             |
-|          | Deployment status           | Deployment status updated from the API.                          |
-| **Done** | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
-| **Done** | Pull Request review comment | Pull Request diff commented on.                                  |
-| **Done** | Commit comment              | Commit or diff commented on.                                     |
-| **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
-| **Done** | Issue comment               | Issue commented on.                                              |
-| **Done** | Watch                       | User watches a repository.                                       |
-| **Done** | Fork                        | Repository forked.                                               |
-|          | Public                      | Repository changes from private to public.                       |
-| **Done** | Member                      | Collaborator added to a non-organization repository.             |
-|          | Team add                    | Team added or modified on a repository.                          |
-|          | Release                     | Release published in a repository.                               |
-| **Done** | Gollum                      | Wiki page updated.                                               |
-|          | Page build                  | Pages site built.                                                |
