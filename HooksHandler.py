@@ -1,6 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+################################################################################
+#                                                                              #
+#                                HooksHandler.py                               #
+#                                   by Niols                                   #
+#                                                                              #
+#  BEERWARE License:                                                           #
+#  <niols@niols.net> wrote this file. As long as you retain this notice you    #
+#  can do whatever you want with this stuff. If we meet some day, and you      #
+#  think this stuff is worth it, you can buy me a beer in return.              #
+#  –– Poul-Henning Kamp                                                        #
+#                                                                              #
+################################################################################
+
 from multiprocessing import Process, Queue
 from Queue import Empty
 from Bottle import Bottle, request, redirect

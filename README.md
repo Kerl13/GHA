@@ -98,48 +98,11 @@ By the way, a script can be easely modified :)
 License
 -------
 
-DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE Version 2, December 2004
+BEERWARE Licence
 
-Copyright (C) 2004 Sam Hocevar
+<niols@niols.net> wrote this file. As long as you retain this notice you
+can do whatever you want with this stuff. If we meet some day, and you think
+this stuff is worth it, you can buy me a beer in return.
 
-Everyone is permitted to copy and distribute verbatim or modified copies of this license document, and changing it is allowed as long as the name is changed.
+–– Poul-Henning Kamp
 
-DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-You just DO WHAT THE FUCK YOU WANT TO.
-
-
-TODO
-----
-
-* Make hooker.py more powerfull (add, remove, edit, …)
-* Write a SCRIPTING.md (in wiki maybe)
-* Support many languages (?)
-* Support all hooks :
-
-| Status   | Event                       | Comment                                                          |
-|----------|-----------------------------|------------------------------------------------------------------|
-| **Done** | Commit comment              | Commit or diff commented on.                                     |
-| **Done** | Create                      | Branch, or tag created.                                          |
-| **Done** | Delete                      | Branch or tag deleted.                                           |
-| WIP      | Deployment                  | Repository deployed.                                             |
-| WIP      | Deployment status           | Deployment status updated from the API.                          |
-|          | Download                    |                                                                  |
-|          | Follow                      |                                                                  |
-| **Done** | Fork                        | Repository forked.                                               |
-|          | Fork Apply                  |                                                                  |
-|          | Gist                        |                                                                  |
-| **Done** | Gollum                      | Wiki page updated.                                               |
-| **Done** | Issues                      | Issue opened, closed, assigned, or labeled.                      |
-| **Done** | Issue comment               | Issue commented on.                                              |
-| **Done** | Member                      | Collaborator added to a non-organization repository.             |
-|          | Page build                  | Pages site built.                                                |
-|          | Ping                        |                                                                  |
-| **Done** | Public                      | Repository changes from private to public.                       |
-| **Done** | Pull Request                | Pull Request opened, closed, assigned, labeled, or synchronized. |
-| **Done** | Pull Request review comment | Pull Request diff commented on.                                  |
-| **Done** | Push                        | Git push to a repository.                                        |
-|          | Release                     | Release published in a repository.                               |
-|          | Status                      | Commit status updated from the API.                              |
-|          | Team add                    | Team added or modified on a repository.                          |
-|          | Watch                       | User watches a repository.                                       |
