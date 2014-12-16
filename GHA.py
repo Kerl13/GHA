@@ -20,7 +20,7 @@ from json import loads, dumps
 
 from FrontBot import *
 from HooksHandler import *
-from ShortURLs import *
+import URLShortener
 
 from GithubHooks import *
 
@@ -151,15 +151,7 @@ if ARGS.export_arguments:
 hooks_queue = Queue ()
 text_queue = Queue ()
 
-baseurl = 'http://%s' % ARGS.web_host
-if ARGS.web_port != 80:
-    baseurl += ':%s' % ARGS.web_port
-baseurl += '/'
-SU = ShortURLs(baseurl, '.shorturls')
-
-GithubHooks.add_su(SU)
-
-HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, SU, [hooks_queue]).start()
+HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, [hooks_queue]).start()
 
 F = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
 FrontBotThread(F).start()

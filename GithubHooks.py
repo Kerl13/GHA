@@ -16,14 +16,10 @@
 
 
 from FrontBot import C
+import URLShortener
 
 
 class GithubHooks:
-
-    su = None
-
-    def add_su(self, su):
-        self.su = su
 
     def handle (self, headers, body):
         body = loads (body)
@@ -38,12 +34,12 @@ class GithubHooks:
     def commit_comment (self, headers, body):
         return '%s commented on commit %s. (%s)' % ( C.Cyan( body['comment']['user']['login'] ),
                                                      C.Gray( body['comment']['commit_id'][:7] ),
-                                                     C.Blue( self.su.url_to_short( body['comment']['html_url'] ), False ) )
+                                                     C.Blue( URLShortener.short( body['comment']['html_url'] ), False ) )
 
     def create (self, headers, body):
         if body['ref_type'] == 'repository':
             return '%s created a repository. (%s)' % ( C.Cyan( body['sender']['login'] ),
-                                                       C.Blue( self.su.url_to_short( body['repository']['html_url'] ), False ) )
+                                                       C.Blue( URLShortener.short( body['repository']['html_url'] ), False ) )
         else:
             return '%s created the %s %s.' % ( C.Cyan( body['sender']['login'] ),
                                                body['ref_type'],
@@ -85,7 +81,7 @@ class GithubHooks:
 
     def gollum (self, headers, body):
         string = '%s updated the wiki. (%s)' % ( C.Cyan( body['sender']['login'] ),
-                                                 C.Blue( self.su.url_to_short( body['repository']['html_url']+'/wiki' ), False ) )
+                                                 C.Blue( URLShortener.short( body['repository']['html_url']+'/wiki' ), False ) )
         for page in body['pages']:
             string += '\n%s %s %s. (%s)' % ( C.Gray( page['sha'][:7] ), # Really 7 for pages sha ?
                                              page['action'],
@@ -102,17 +98,17 @@ class GithubHooks:
             else:
                 string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
         string += 'issue %s. (%s)' % ( C.Gray( '#'+str(body['issue']['number']) ),
-                                       C.Blue( self.su.url_to_short( body['issue']['html_url'] ), False ) )
+                                       C.Blue( URLShortener.short( body['issue']['html_url'] ), False ) )
         return string
 
     def issue_comment (self, headers, body):
         return '%s commented issue %s. (%s)' % ( C.Cyan( body['comment']['user']['login'] ),
                                                  C.Gray( '#'+str(body['issue']['number']) ),
-                                                 C.Blue( self.su.url_to_short( body['issue']['html_url'] ), False ) )
+                                                 C.Blue( URLShortener.short( body['issue']['html_url'] ), False ) )
 
     def member (self, headers, body):
         return '%s added %s as collaborator.' % ( C.Cyan( body['sender']['login'] ),
-                                                       C.Cyan( body['member']['login'] ) )
+                                                  C.Cyan( body['member']['login'] ) )
 
     def page_build (self, headers, body):
         # V.prnt( 'GithubHooks.page_build', V.ERROR )
@@ -131,19 +127,19 @@ class GithubHooks:
         if body['action'] in ['assigned', 'unassigned']:
             string += '%s on ' % ( C.Cyan( body['assignee']['login'] ), )
         string += 'pull request %s. (%s)' % ( C.Gray( '#'+str(body['pull_request']['number']) ),
-                                              C.Blue( self.su.url_to_short( body['pull_request']['html_url'] ), False ) )
+                                              C.Blue( URLShortener.short( body['pull_request']['html_url'] ), False ) )
 
     def pull_request_review_comment (self, headers, body):
         return '%s commented pull request %s. (%s)' % ( C.Cyan( body['comment']['user']['login'] ),
                                                         C.Gray( '#'+str(body['pull_request']['number']) ),
-                                                        C.Blue( self.su.url_to_short( body['comment']['html_url'] ), False ) )
+                                                        C.Blue( URLShortener.short( body['comment']['html_url'] ), False ) )
 
     def push (self, headers, body):
 	if body['commits']:
 	        string = '%s pushed %s commits to %s. (%s)' % ( C.Cyan( body['pusher']['name'] ),
         	                                                C.Bold( len(body['commits']) ),
                 	                                        C.Red( body['ref'].split('/')[-1] ),
-                        	                                C.Blue( self.su.url_to_short( body['compare'] ), False ) )
+                        	                                C.Blue( URLShortener.short( body['compare'] ), False ) )
         	for commit in body['commits']:
                     string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
                 	                        C.Cyan( commit['committer']['username'] if 'username' in commit['committer'] else commit['committer']['name'] ),
