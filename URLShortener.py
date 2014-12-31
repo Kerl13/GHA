@@ -4,6 +4,6 @@
 from urllib2 import urlopen
 
 def short (url):
-    short_url = urlopen ('http://is.gd/create.php?format=simple&url=' + url)
+    short_url = urlopen ('http://niols.net/u/?api_url=' + url)
     return short_url.readline ()
 
