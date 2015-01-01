@@ -3,7 +3,7 @@
 
 ################################################################################
 #                                                                              #
-#                                GithubHooks.py                                #
+#                                GitHubHooks.py                                #
 #                                   by Niols                                   #
 #                                                                              #
 #  BEERWARE License:                                                           #
@@ -20,7 +20,7 @@ import URLShortener
 import logging
 
 
-class GithubHooks:
+class GitHubHooks:
 
     def handle (self, headers, body):
         logging.debug('Handling GithubHook')
@@ -53,20 +53,20 @@ class GithubHooks:
                                            C.Red( body['ref'] ) )
 
     def deployment (self, headers, body):
-        logging.warning('GithubHooks.deployment')
+        logging.warning('GitHubHooks.deployment')
         return 'The %s environment has been deployed.' % ( C.Bold( body['deployment']['environment'] ), )
 
     def deployment_status (self, headers, body):
-        logging.warning('GithubHooks.deployment')
+        logging.warning('GitHubHooks.deployment')
         return 'The %s environment has been deployed with %s.' % ( C.Bold( body['deployment']['environment'] ),
                                                                    C.Bold( body['deployment_status']['state'] ) )
 
     def download (self, headers, body):
-        logging.warning('GithubHooks.download')
+        logging.warning('GitHubHooks.download')
         return ''
 
     def follow (self, headers, body):
-        logging.warning('GithubHooks.follow')
+        logging.warning('GitHubHooks.follow')
         return ''
 
     def fork (self, headers, body):
@@ -74,11 +74,11 @@ class GithubHooks:
                                       C.Pink( body['forkee']['full_name'] ) )
 
     def fork_apply (self, headers, body):
-        logging.warning('GithubHooks.fork_apply')
+        logging.warning('GitHubHooks.fork_apply')
         return ''
 
     def gist (self, headers, body):
-        logging.warning('GithubHooks.gist')
+        logging.warning('GitHubHooks.gist')
         return ''
 
     def gollum (self, headers, body):
@@ -113,11 +113,11 @@ class GithubHooks:
                                                   C.Cyan( body['member']['login'] ) )
 
     def page_build (self, headers, body):
-        logging.warning('GithubHooks.page_build')
+        logging.warning('GitHubHooks.page_build')
         return ''
 
     def ping (self, headers, body):
-        logging.warning('GithubHooks.ping')
+        logging.warning('GitHubHooks.ping')
         return ''
 
     def public (self, headers, body):
@@ -151,20 +151,20 @@ class GithubHooks:
 		return ''
 
     def release (self, headers, body):
-        logging.warning('GithubHooks.release')
+        logging.warning('GitHubHooks.release')
         return ''
 
     def status (self, headers, body):
-        logging.warning('GithubHooks.status')
+        logging.warning('GitHubHooks.status')
         return ''
 
     def team_add (self, headers, body):
-        logging.warning('GithubHooks.team_add')
+        logging.warning('GitHubHooks.team_add')
         return ''
 
     def watch (self, headers, body):
-        logging.warning('GithubHooks.watch')
+        logging.warning('GitHubHooks.watch')
         return ''
 
 
-GithubHooks = GithubHooks ()
+GitHubHooks = GitHubHooks ()

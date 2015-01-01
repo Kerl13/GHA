@@ -23,7 +23,7 @@ from FrontBot import *
 from HooksHandler import *
 import URLShortener
 
-from GithubHooks import *
+from GitHubHooks import *
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s line %(lineno)s | %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
@@ -138,7 +138,7 @@ while True:
 
     if 'X-Github-Event' in headers.keys():
         try:
-            text_queue.put(('prnt', (GithubHooks.handle(headers, body),)))
+            text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
         except:
             for line in format_exc().split('\n'):
                 if line:
