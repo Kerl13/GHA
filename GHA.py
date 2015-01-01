@@ -15,6 +15,7 @@
 ################################################################################
 
 import argparse
+import logging
 from sys import argv
 from json import loads, dumps
 
@@ -24,8 +25,11 @@ import URLShortener
 
 from GithubHooks import *
 
+logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s line %(lineno)s | %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
-DESCRIPTION = '''GitHub Announcer
+logging.info('Starting')
+
+DESCRIPTION = '''Github Announcer
 
 
 '''
@@ -75,37 +79,37 @@ if ARGS.import_arguments:
             if arg in args and not getattr(ARGS, arg):
                 setattr(ARGS, arg, args[arg])
     except IOError:
-#        V.prnt('The file %s were not found' % (ARGS.import_arguments),
-         exit(1)
+        logging.error ('The file %s were not found', ARGS.import_arguments)
+        exit(1)
     except:
-#        V.prnt ('Error while importing arguments from file.', V.ERROR)
-#        for line in format_exc().split('\n'):
-#            if line:
-#                V.prnt (line, V.ERROR)
+        logging.error ('Error while importing arguments from file.')
+        for line in format_exc().split('\n'):
+            if line:
+                logging.error (line)
         exit(1)
 
 if not ARGS.listen_host:
-#    V.prnt('No listen host given. Using 0.0.0.0.', V.WARNING)
+    logging.info ('No listen host given. Using 0.0.0.0.')
     ARGS.listen_host = '0.0.0.0'
 
 if not ARGS.listen_port:
-#    V.prnt('No listen port given. Using 80.', V.WARNING)
+    logging.info ('No listen port given. Using 80.')
     ARGS.listen_port = 80
 
 if not ARGS.irc_host:
-#    V.prnt('No IRC host given. Using localhost.', V.WARNING)
+    logging.info ('No IRC host given. Using localhost.')
     ARGS.irc_host = 'localhost'
 
 if not ARGS.irc_port:
-#    V.prnt('No IRC Port given. Using 6667.', V.WARNING)
+    logging.info ('No IRC port given. Using 6667.')
     ARGS.irc_port = 6667
 
 if not ARGS.irc_chans:
-#    V.prnt('No IRC Chans given.', V.WARNING)
+    logging.info ('No IRC chans given.')
     ARGS.irc_chans = []
 
 if not ARGS.irc_name:
-#    V.prnt('No IRC Name given. Using GHA.', V.WARNING)
+    logging.info ('No IRC name given. Using GHA.')
     ARGS.irc_name = 'GHA'
 
 if ARGS.export_arguments:
@@ -141,5 +145,4 @@ while True:
                     text_queue.put(('prnt', (line, ['niols'])))
 
     else:
-        pass
-#        V.prnt('Received invalid request.', V.WARNING)
+        logging.warning ('Received invalid request.')

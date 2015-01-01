@@ -17,11 +17,13 @@
 from json import loads
 from FrontBot import C
 import URLShortener
+import logging
 
 
 class GithubHooks:
 
     def handle (self, headers, body):
+        logging.debug('Handling GithubHook')
         body = loads (body)
         if 'X-Github-Event' in headers.keys():
             message = getattr(self, headers['X-Github-Event']) (headers, body);
@@ -51,20 +53,20 @@ class GithubHooks:
                                            C.Red( body['ref'] ) )
 
     def deployment (self, headers, body):
-#        # V.prnt( 'GithubHooks.deployment', V.ERROR )
+        logging.warning('GithubHooks.deployment')
         return 'The %s environment has been deployed.' % ( C.Bold( body['deployment']['environment'] ), )
 
     def deployment_status (self, headers, body):
-        # V.prnt( 'GithubHooks.deployment', V.ERROR )
+        logging.warning('GithubHooks.deployment')
         return 'The %s environment has been deployed with %s.' % ( C.Bold( body['deployment']['environment'] ),
                                                                    C.Bold( body['deployment_status']['state'] ) )
 
     def download (self, headers, body):
-        # V.prnt( 'GithubHooks.download', V.ERROR )
+        logging.warning('GithubHooks.download')
         return ''
 
     def follow (self, headers, body):
-        # V.prnt( 'GithubHooks.follow', V.ERROR )
+        logging.warning('GithubHooks.follow')
         return ''
 
     def fork (self, headers, body):
@@ -72,11 +74,11 @@ class GithubHooks:
                                       C.Pink( body['forkee']['full_name'] ) )
 
     def fork_apply (self, headers, body):
-        # V.prnt( 'GithubHooks.fork_apply', V.ERROR )
+        logging.warning('GithubHooks.fork_apply')
         return ''
 
     def gist (self, headers, body):
-        # V.prnt( 'GithubHooks.gist', V.ERROR )
+        logging.warning('GithubHooks.gist')
         return ''
 
     def gollum (self, headers, body):
@@ -111,11 +113,11 @@ class GithubHooks:
                                                   C.Cyan( body['member']['login'] ) )
 
     def page_build (self, headers, body):
-        # V.prnt( 'GithubHooks.page_build', V.ERROR )
+        logging.warning('GithubHooks.page_build')
         return ''
 
     def ping (self, headers, body):
-        # V.prnt( 'GithubHooks.ping', V.ERROR )
+        logging.warning('GithubHooks.ping')
         return ''
 
     def public (self, headers, body):
@@ -149,19 +151,19 @@ class GithubHooks:
 		return ''
 
     def release (self, headers, body):
-        # V.prnt( 'GithubHooks.release', V.ERROR )
+        logging.warning('GithubHooks.release')
         return ''
 
     def status (self, headers, body):
-        # V.prnt( 'GithubHooks.status', V.ERROR )
+        logging.warning('GithubHooks.status')
         return ''
 
     def team_add (self, headers, body):
-        # V.prnt( 'GithubHooks.team_add', V.ERROR )
+        logging.warning('GithubHooks.team_add')
         return ''
 
     def watch (self, headers, body):
-        # V.prnt ('GithubHooks.watch', V.ERROR )
+        logging.warning('GithubHooks.watch')
         return ''
 
 

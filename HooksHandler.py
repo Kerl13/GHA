@@ -14,6 +14,7 @@
 #                                                                              #
 ################################################################################
 
+import logging
 from multiprocessing import Process, Queue
 from Queue import Empty
 from Bottle import Bottle, request, redirect
@@ -27,12 +28,12 @@ class HooksHandlerThread(Process):
         self.port = port
         self.queues = queues
         self.app = Bottle()
-        # V.prnt('[HooksHandler] ignited on %s/%s' % (host, port), V.DEBUG)
+        logging.info('Ignited on %s/%s', host, port)
 
     def run(self):
         @self.app.route('/', method='POST')
         def index():
-            # V.prnt('[HooksHandler] Received request', V.DEBUG)
+            logging.info('Received request')
             headers_list = request.headers.items()
             headers_dict = {}
             for key, value in headers_list:
@@ -45,6 +46,5 @@ class HooksHandlerThread(Process):
         try:
             self.app.run(host=self.host, port=self.port, quiet=True)
         except Exception, ex:
-	    pass
-            # V.prnt('[HooksHandler] Error while starting server: '+str(ex), V.ERROR)
+            logging.critical('Error while starting server: %s', str(ex))
 

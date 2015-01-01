@@ -16,10 +16,10 @@
 
 import ircbot
 import irclib
+import logging
 from multiprocessing import Process, Queue
 from Queue import Empty
 from traceback import format_exc
-
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
 I provide a PrinterBot.prnt method allowing some other python scripts
@@ -55,11 +55,6 @@ class FrontBot(ircbot.SingleServerIRCBot):
     (one of) the input queues, and the bot will do the job.
     '''
 
-#    def _vprnt(self, string, level):
-#        pass
-#        V.prnt('[FrontBot %s] %s' % (self.name, string), level)
-
-
     def __init__(self, server = 'localhost', port = 6667, chans = [], name = 'FrontBot',
                  input_queues = [], output_queues = []):
         ircbot.SingleServerIRCBot.__init__(self, [(server, port)], name, name, 10)
@@ -67,11 +62,11 @@ class FrontBot(ircbot.SingleServerIRCBot):
         self.name = name
         self.input_queues = input_queues
         self.output_queues = output_queues
-#        self._vprnt('init on %s/%d : %s' % (server, port, ', '.join(chans)), V.DEBUG)
+        logging.info('Init on %s/%s : %s', server, port, ', '.join(chans))
 
 
     def on_welcome(self, serv, ev):
-#        self._vprnt('welcomed', V.DEBUG)
+        logging.info('Welcomed')
         self.serv = serv
         self.chan_queues = {}
         for chan in self.chans:
@@ -81,14 +76,13 @@ class FrontBot(ircbot.SingleServerIRCBot):
 
 
     def on_pubmsg(self, serv, ev):
-#        self._vprnt('pubmsg %s/%s: %s' % (ev.target(), ev.source(), ev.arguments()[0]),
-#                    V.DEBUG)
+        logging.debug('pubmsg %s/%s: %s', ev.target(), ev.source(), ev.arguments()[0])
         if ev.arguments()[0] == self.name+': help':
             self.prnt(HELP_MESSAGE, ev.target())
 
 
     def on_privmsg(self, serv, ev):
-#        self._vprnt('privmsg %s: %s' % (ev.source(), ev.arguments()[0]), V.DEBUG)
+        logging.debug('privmsg %s: %s', ev.source(), ev.arguments()[0])
         if ev.arguments()[0] == self.name+': help':
             self.prnt(HELP_MESSAGE, ev.source())
 
@@ -100,10 +94,9 @@ class FrontBot(ircbot.SingleServerIRCBot):
         except Empty:
             pass
         except:
-	    pass
-#            self._vprnt('_prnt: Uncaught exception', V.ERROR)
-#            for line in format_exc().split('\n'):
-#                self._vprnt(line, V.ERROR)
+            logging.warning('_prnt: Uncaught exception')
+            for line in format_exc().split('\n'):
+                logging.warning(line)
         irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_MESSAGES,
                                                 self._prnt, (chan,))
 
@@ -116,7 +109,7 @@ class FrontBot(ircbot.SingleServerIRCBot):
         '''
         if chans == None:
             chans = self.chans
-#        self._vprnt('prnt on %s : %s' % (', '.join(chans), message), V.DEBUG)
+        logging.debug('prnt on %s : %s', ', '.join(chans), message)
         for chan in chans:
             if chan not in self.chan_queues:
                 self.chan_queues[chan] = Queue()
@@ -131,16 +124,14 @@ class FrontBot(ircbot.SingleServerIRCBot):
         Prints a V.WARNING level message if chan is already in the list.
         @param chan: The chan to add.
         '''
-#        self._vprnt('adding chan %s' % (chan,), V.DEBUG)
+        logging.info('adding chan %s', chan)
         if chan not in self.chans:
             self.serv.join(chan)
             self.chan_queues[chan] = Queue()
             self._prnt(chan)
         else:
-	    pass
-#            self._vprnt('chan %s already in chan list (%s)' \
-#                        % (chan, ', '.join(self.chans)),
-#                        V.WARNING)
+            logging.warning('chan %s already in chan list (%s)', \
+                                chan, ', '.join(self.chans))
 
 
     def del_chan(self, chan):
@@ -149,16 +140,14 @@ class FrontBot(ircbot.SingleServerIRCBot):
         Prints a V.WARNING level message if chan is not in the list.
         @param chan: The chan to delete.
         '''
-#        self._vprnt('deleting chan %s' % (chan,), V.DEBUG)
+        logging.info('deleting chan %s', chan)
         if chan in self.chans:
             pass
             # PARTIR DU CANAL
             # SUPPRIMER L'ENTRÉE DU DICTIONNAIRE
         else:
-            pass
-#            self._vprnt('chan %s is not in chan list (%s)' \
-#                        % (chan, ', '.join(self.chans)),
-#                        V.WARNING)
+            logging.warning('chan %s is not in chan list (%s)', \
+                                chan, ', '.join(self.chans))
 
 
     def _check_queue(self, queue):
@@ -168,11 +157,10 @@ class FrontBot(ircbot.SingleServerIRCBot):
         except Empty:
             pass
         except:
-#            self._vprnt('_check_queue: Uncaught exception', V.ERROR)
+            logging.warning('_check_queue: Uncaught exception')
             for line in format_exc().split('\n'):
                 if line:
-		    pass
-#                    self._vprnt(line, V.ERROR)
+                    logging.warning(line)
         irclib.ServerConnection.execute_delayed(self.serv, TIME_BETWEEN_QUEUE_CHECKS,
                                                 self._check_queue, (queue,))
 
