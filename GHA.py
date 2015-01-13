@@ -10,7 +10,7 @@
 #  <niols@niols.net> wrote this file. As long as you retain this notice you    #
 #  can do whatever you want with this stuff. If we meet some day, and you      #
 #  think this stuff is worth it, you can buy me a beer in return.              #
-#  –– Poul-Henning Kamp                                                        #
+#                                                        –– Poul-Henning Kamp  #
 #                                                                              #
 ################################################################################
 
@@ -24,6 +24,7 @@ from HooksHandler import *
 import URLShortener
 
 from GitHubHooks import *
+import GitLabHooks
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s line %(lineno)s | %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
@@ -136,13 +137,15 @@ def irc_prnt (message):
 while True:
     (headers, body) = hooks_queue.get()
 
-    if 'X-Github-Event' in headers.keys():
-        try:
-            text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
-        except:
-            for line in format_exc().split('\n'):
-                if line:
-                    text_queue.put(('prnt', (line, ['niols'])))
+    try:
 
-    else:
-        logging.warning ('Received invalid request.')
+        if 'X-Github-Event' in headers.keys():
+            text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
+
+        else:
+            text_queue.put(('prnt', (GitLabHooks.handle(headers, body),)))
+        
+    except:
+        for line in format_exc().split('\n'):
+            if line:
+                text_queue.put(('prnt', (line, ['niols'])))

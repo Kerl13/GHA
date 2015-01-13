@@ -33,7 +33,7 @@ class HooksHandlerThread(Process):
     def run(self):
         @self.app.route('/', method='POST')
         def index():
-            logging.info('Received request')
+            logging.debug('Received request')
             headers_list = request.headers.items()
             headers_dict = {}
             for key, value in headers_list:
@@ -41,6 +41,7 @@ class HooksHandlerThread(Process):
             body = request.body.read()
             for queue in self.queues:
                 queue.put((headers_dict, body))
+            print headers_dict, body
             return ''
 
         try:
