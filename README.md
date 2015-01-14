@@ -1,42 +1,35 @@
 GHA
 ===
 
-A GitHub Announcer for IRC.
+A GitHub Announcer for IRC. Also support GitLab.
 
-This project has two parts :
+This project is made of :
 
-* one very simple webserver listening for webhooks on a given port
-* one little IRCBot writing it (in colors !) on IRC
+- A ([Bottle](http://bottlepy.org/docs/dev/index.html)) web server receiving web hooks from GitHub or GitLab
+- An [IRCBot](http://sourceforge.net/projects/python-irclib/files/) writing on IRC.
+
+Since it is using the python-irclib files, GHA uses python2.
 
 
-Installation
-------------
+Get started
+-----------
 
 Just copy the files to some place (or clone this repository).
 
-You also need to install Bottle (http://bottlepy.org).
-That can be done with `pip install bottle`.
-There's also a version of Bottle in the repository.
-So you can just rename Bottle-version.py into Bottle.py.
+Try `./GHA.py --help`. You should see something like
 
-
-Utilisation
------------
-
-### Script's side
-
-The python script needs some parameters, that you can get *via* `python gha.py --help`.
-
-    usage: gha.py [-h] [-gh GH_HOST] [-gp GH_PORT] [-ih IRC_HOST] [-ip IRC_PORT]
-                  [-ic [IRC_CHANS [IRC_CHANS ...]]] [-in IRC_NAME] [-ea FILE]
-                  [-ia FILE]
-
+    usage: ./GHA.py [-h] [-lh LISTEN_HOST] [-lp LISTEN_PORT] [-ih IRC_HOST]
+                    [-ip IRC_PORT] [-ic [IRC_CHANS [IRC_CHANS ...]]]
+                    [-in IRC_NAME] [-ea FILE] [-ia FILE]
+    
+    Github Announcer
+    
     optional arguments:
       -h, --help            show this help message and exit
-      -gh GH_HOST, --gh-host GH_HOST
-                            the address where github sends the data
-      -gp GH_PORT, --gh-port GH_PORT
-                            the port where github sends the data
+      -lh LISTEN_HOST, --listen-host LISTEN_HOST
+                            the address where GHA will be listening
+      -lp LISTEN_PORT, --listen-port LISTEN_PORT
+                            the port where GHA will be listening
       -ih IRC_HOST, --irc-host IRC_HOST
                             the irc server's address
       -ip IRC_PORT, --irc-port IRC_PORT
@@ -49,60 +42,47 @@ The python script needs some parameters, that you can get *via* `python gha.py -
                             export arguments in the given file
       -ia FILE, --import-arguments FILE
                             import arguments from the given file
+    
+A simple case to get started:
 
-For example :
+    ./GHA.py -lp 9090 -ih irc.freenode.net -ic '#GHA' -ea my-gha.cnf
 
-    python gha.py --gh-host some.place.com --gh-port 4242 \
-        --irc-host irc.freenode.net --irc-port 6667 \
-        --irc-chans '#oneChan' '#oneOtherChan' --irc-name MyIRCBot
+This will create the file `my.cnf` containing the configuration for a GitHub Announcer listening on `0.0.0.0:9090`, and connected on `irc.freenode.net/6667` on channel `#GHA`.
+You can change the listening host with `-lh`, the IRC port with `-ip`, the IRC name of the bot with `-in`.
+Note that the channel list must be quoted, since `#` is a special character in shell.
 
-If you want to re-use several times the same config, you should save it in a file :
+After that, you just need to use:
 
-    python gha.py -gh some.place.com ... -in MyIRCBot --export-arguments my_file.cnf
+    ./GHA.py -ia my-gha.cnf
 
-After that, you only need to import your arguments from this file :
+You can change the `my-gha.cnf` yourself, if you respect the JSON syntax
+[supported by python](https://docs.python.org/2/library/json.html).
 
-    python gha.py --import-arguments my_file.cnf
+Now that your `GHA` is running, you just have to
+[set your GitHub/GitLab webhooks](https://github.com/Niols/GHA/wiki/Add-a-WebHook).
 
-And you can override the file arguments with yours :
-
-    python gha.py -ia my_file.cnf -gp 4224
-
-
-### GitHub's side
-
-In your repositoriy's settings, go to « Webhooks & Services ».
-Look for the « Add webhook » button.
-
-* You need to give the url that you gave to the script to « Payload URL » (in the example, that will be `http://some.place.com:4242/`).
-* In « Content type » select `application/json` (by default) which is the only one supported
-* The select your webhooks. GHA doesn't support everything, but it'll improve (i promise !)
-* Aaaand… click on « Add webhook » :)
-
-You can also use the `hooker.py` script. It'll try to help you adding your webhooks.  
-**Be carefull with scripts that want to access to your credentials !**
-
-Simply run `python hooker.py` and answer to his questions.
 
 
 Why this script ?
 -----------------
 
-Note that there exists an IRC Service for GitHub, but it has an inconvenient : the bot isn't staying on the IRC channel(s). You have then two solutions : either your channel doesn't have the `+n` mode, either the bot will join/part each time you have a message…
+Note that there exists an IRC Service for GitHub.
 
-I wanted not to get spammed (too much), and to keep my `+n` mode.
+But:
 
-By the way, a script can be easely modified :)
+- This script also support GitLab.
+- The bot stays on the IRC chan, and do not join-part all the time.
+- A script can easely be modified, if you want to change a little part of it.
 
 
 License
 -------
 
-BEERWARE Licence
-
-<niols@niols.net> wrote this file. As long as you retain this notice you
-can do whatever you want with this stuff. If we meet some day, and you think
-this stuff is worth it, you can buy me a beer in return.
-
-–– Poul-Henning Kamp
+> BEERWARE Licence
+> 
+> <niols@niols.net> wrote this file. As long as you retain this notice you
+> can do whatever you want with this stuff. If we meet some day, and you think
+> this stuff is worth it, you can buy me a beer in return.
+> 
+> —— Poul-Henning Kamp
 
