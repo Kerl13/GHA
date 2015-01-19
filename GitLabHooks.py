@@ -39,18 +39,21 @@ def handle (headers, body):
 
 def push (headers, body):
     max_commits_shown = 5
-    ret = '[%s] %s pushed %s commits to %s. (%s)' % ( C.Pink ( '/'.join( body['repository']['homepage'] .split('/')[-2:]) ),
+    if body['commits']:
+        ret = '[%s] %s pushed %s commits to %s. (%s)' % ( C.Pink ( '/'.join( body['repository']['homepage'] .split('/')[-2:]) ),
                                                       C.Cyan ( body['user_name'] ),
                                                       C.Bold ( len (body['commits']) ),
                                                       C.Red ( body['ref'].split('/')[-1] ),
                                                       C.Blue ( URLShortener.short ( body['repository']['homepage'] + '/compare/' + body['before'] + '...' + body['after'] ), False ))
-    if len (body['commits']) > max_commits_shown:
-        string += '\nHere are the last '+max_commits_shown+':'
-    for commit in body['commits'][-max_commits_shown]:
-        ret += '\n%s %s: %s' % ( C.Gray ( commit['id'][:9] ) , # For GitLab, this is 9
-                                 C.Cyan ( commit['author']['name'] ) ,
-                                 commit['message'].split('\n')[0] )
-    return ret
+        if len (body['commits']) > max_commits_shown:
+            string += '\nHere are the last '+max_commits_shown+':'
+        for commit in body['commits'][-max_commits_shown]:
+            ret += '\n%s %s: %s' % ( C.Gray ( commit['id'][:9] ) , # For GitLab, this is 9
+                                     C.Cyan ( commit['author']['name'] ) ,
+                                     commit['message'].split('\n')[0] )
+        return ret
+    else:
+        return ''
         
 
 
