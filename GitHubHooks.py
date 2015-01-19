@@ -150,8 +150,11 @@ class GitHubHooks:
 		return ''
 
     def release (self, headers, body):
-        logging.warning('GitHubHooks.release')
-        return ''
+        ret = '%s %s the release %s' % ( C.Cyan ( body['release']['author']['login'] ) ,
+                                          body['action'] ,
+                                          C.Red ( body['release']['tag_name'] ) )
+        if body['release']['name']: ret += ': ' + body['release']['name']
+        return ret + '.'
 
     def status (self, headers, body):
         logging.warning('GitHubHooks.status')
