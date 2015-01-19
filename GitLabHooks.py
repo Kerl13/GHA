@@ -38,16 +38,15 @@ def handle (headers, body):
 
 
 def push (headers, body):
-    ret = '[%s] %s pushed %s commits to %s. (%s)' % ( C.Pink ( body['repository']['name'] ),
+    ret = '[%s] %s pushed %s commits to %s. (%s)' % ( C.Pink ( '/'.join( body['repository']['homepage'] .split('/')[-2:]) ),
                                                       C.Cyan ( body['user_name'] ),
                                                       C.Bold ( len (body['commits']) ),
                                                       C.Red ( body['ref'].split('/')[-1] ),
-                                                      C.Blue ( URLShortener.short ( body['repository']['homepage'] ), False ))
+                                                      C.Blue ( URLShortener.short ( body['repository']['homepage'] + '/compare/' + body['before'] + '...' + body['after'] ), False ))
     for commit in body['commits']:
-        ret += '\n%s %s: %s (%s)' % ( C.Gray ( commit['id'][:7] ) ,
-                                      C.Cyan ( commit['author']['name'] ) ,
-                                      commit['message'].split('\n')[0] ,
-                                      C.Blue ( URLShortener.short ( commit['url'] ), False ) )
+        ret += '\n%s %s: %s' % ( C.Gray ( commit['id'][:9] ) , # For GitLab, this is 9
+                                 C.Cyan ( commit['author']['name'] ) ,
+                                 commit['message'].split('\n')[0] )
     return ret
         
 
