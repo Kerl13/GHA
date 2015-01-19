@@ -58,7 +58,7 @@ def tag (headers, body):
 
 
 def issues (headers, body):
-    ret = '%s %s' % ( C.Cyan ( body['user']['name'] ) ,
+    ret = '%s %s' % ( C.Cyan ( body['user']['name'] ) , # user / username ?
                       body['object_attributes']['action'] )
     if body['object_attributes']['action'] in [ 'open' , 'reopen' ]:
         ret += 'ed'
@@ -70,5 +70,8 @@ def issues (headers, body):
 
 
 def merge_request (headers, body):
-    return ''
-
+    return '[%s] %s %s merge request %s. (%s)' % ( C.Pink ( '/'.join( body['object_attributes']['target']['http_url'] .split('/')[-2:]) ) ,
+                                                   C.Cyan ( body['user']['name'] ) ,
+                                                   body['object_attributes']['state'] ,
+                                                   C.Bold ( body['object_attributes']['id'] ),
+                                                   C.Blue ( URLShortener.short ( body['object_attributes']['target']['http_url'] + '/merge_requests/' + body['object_attributes']['id'] ) , False ) )
