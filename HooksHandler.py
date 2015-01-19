@@ -41,7 +41,6 @@ class HooksHandlerThread(Process):
             body = request.body.read()
             for queue in self.queues:
                 queue.put((headers_dict, body))
-            print headers_dict, body
             return ''
 
         try:
