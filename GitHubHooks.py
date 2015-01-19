@@ -117,8 +117,7 @@ class GitHubHooks:
         return ''
 
     def ping (self, headers, body):
-        logging.warning('GitHubHooks.ping')
-        return ''
+        return '%s pinged me.' % body['sender']['login']
 
     def public (self, headers, body):
         return '%s made this repository public.' % ( C.Cyan( body['sender']['login'] ) )
