@@ -52,7 +52,9 @@ def push (headers, body):
 
 
 def tag (headers, body):
-    return ''
+    return '[%s] %s added the tag %s.' % ( C.Pink ( '/'.join( body['repository']['homepage'] .split('/')[-2:]) ) ,
+                                           C.Cyan ( body['user_name'] ) ,
+                                           C.Red ( body['ref'].split('/')[-1] ) )
 
 
 def issues (headers, body):
