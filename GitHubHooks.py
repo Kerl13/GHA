@@ -88,7 +88,7 @@ class GitHubHooks:
             string += '\n%s %s %s. (%s)' % ( C.Gray( page['sha'][:7] ), # Really 7 for pages sha ?
                                              page['action'],
                                              C.Bold( page['page_name'] ),
-                                             C.Blue( page['html_url'], False ) )
+                                             C.Blue( URLShortener.short( page['html_url'] ) , False ) )
         return string
 
     def issues (self, headers, body):
