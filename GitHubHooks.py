@@ -144,7 +144,7 @@ class GitHubHooks:
                         	                                C.Blue( URLShortener.short( body['compare'] ), False ) )
             if len (body['commits']) > max_commits_shown:
                 string += '\nHere are the last '+max_commits_shown+':'
-            for commit in body['commits'][-max_commits_shown]:
+            for commit in body['commits'][-max_commits_shown:]:
                 string += '\n%s %s: %s' % ( C.Gray( commit['id'][:7] ),
                 	                        C.Cyan( commit['committer']['username'] if 'username' in commit['committer'] else commit['committer']['name'] ),
                         	                commit['message'].split('\n')[0] )

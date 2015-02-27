@@ -47,7 +47,7 @@ def push (headers, body):
                                                       C.Blue ( URLShortener.short ( body['repository']['homepage'] + '/compare/' + body['before'] + '...' + body['after'] ), False ))
         if len (body['commits']) > max_commits_shown:
             string += '\nHere are the last '+max_commits_shown+':'
-        for commit in body['commits'][-max_commits_shown]:
+        for commit in body['commits'][-max_commits_shown:]:
             ret += '\n%s %s: %s' % ( C.Gray ( commit['id'][:9] ) , # For GitLab, this is 9
                                      C.Cyan ( commit['author']['name'] ) ,
                                      commit['message'].split('\n')[0] )
