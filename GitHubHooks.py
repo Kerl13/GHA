@@ -168,8 +168,7 @@ class GitHubHooks:
         return ''
 
     def watch (self, headers, body):
-        logging.warning('GitHubHooks.watch')
-        return ''
+        return '%s just watched this repository.' % ( C.Cyan ( body['sender']['login']) )
 
 
 GitHubHooks = GitHubHooks ()
