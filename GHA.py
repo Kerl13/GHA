@@ -18,6 +18,7 @@ import argparse
 import logging
 from sys import argv
 from json import loads, dumps
+from os import getpid
 
 from FrontBot import *
 from HooksHandler import *
@@ -29,6 +30,7 @@ import GitLabHooks
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s line %(lineno)s | %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
 logging.info('Starting')
+logging.info('Main thread\'s pid: %d' % (getpid(),));
 
 DESCRIPTION = '''Github Announcer
 

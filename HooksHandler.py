@@ -31,6 +31,8 @@ class HooksHandlerThread(Process):
         logging.info('Ignited on %s/%s', host, port)
 
     def run(self):
+        logging.info ('HooksHandlerThread\'s pid: %d' % (self.pid,))
+
         @self.app.route('/', method='POST')
         def index():
             logging.debug('Received request')
