@@ -20,7 +20,6 @@ import logging
 from multiprocessing import Process, Queue
 from Queue import Empty
 from traceback import format_exc
-from os import getpid
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
 I provide a PrinterBot.prnt method allowing some other python scripts
@@ -183,7 +182,6 @@ class FrontBotThread(Process):
         self.bot = bot
 
     def run(self):
-        logging.info ('FrontBotThread\'s pid: %d' % (self.pid,))
         self.bot.start()
 
 

@@ -30,7 +30,6 @@ import GitLabHooks
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s line %(lineno)s | %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
 logging.info('Starting')
-logging.info('Main thread\'s pid: %d' % (getpid(),));
 
 DESCRIPTION = '''Github Announcer
 
@@ -72,6 +71,11 @@ parser.add_argument('-ia', '--import-arguments',
                     metavar = 'FILE',
                     type = str, # à rendre plus précis
                     help = 'import arguments from the given file')
+
+parser.add_argument('--write-pid',
+                    metavar = 'FILE',
+                    type = str,
+                    help = 'write all threads pids in given file')
 
 ARGS = parser.parse_args()
 
@@ -115,6 +119,13 @@ if not ARGS.irc_name:
     logging.info ('No IRC name given. Using GHA.')
     ARGS.irc_name = 'GHA'
 
+logging.info('Main thread\'s pid: %d' % (getpid(),));
+if ARGS.write_pid:
+    open (ARGS.write_pid, 'w').close() # Shrink size to 0
+    logging.debug ('Writing main thread\'s pid in `%s`.' % ARGS.write_pid)
+    open (ARGS.write_pid, 'a').write (str(getpid ()) + '\n')
+
+
 if ARGS.export_arguments:
     args = {}
     for arg in [ s for s in dir(ARGS) if s[0] != '_' and s not in ['import_arguments', 'export_arguments'] ]:
@@ -127,10 +138,22 @@ if ARGS.export_arguments:
 hooks_queue = Queue ()
 text_queue = Queue ()
 
-HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, [hooks_queue]).start()
+HHT = HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, [hooks_queue])
+HHT.start()
 
-F = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
-FrontBotThread(F).start()
+logging.info ('HooksHandlerThread\'s pid: %d' % HHT.pid)
+if ARGS.write_pid:
+    logging.debug ('Writing HooksHandlerThread\'s pid in `%s`.' % ARGS.write_pid)
+    open (ARGS.write_pid, 'a').write (str (HHT.pid) + '\n')
+
+FB = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name, [text_queue])
+FBT = FrontBotThread(FB)
+FBT.start()
+
+logging.info ('FrontBotThread\'s pid: %d' % FBT.pid)
+if ARGS.write_pid:
+    logging.debug ('Writing FrontBotThread\'s pid in `%s`.' % ARGS.write_pid)
+    open (ARGS.write_pid, 'a').write (str (FBT.pid) + '\n')
 
 def irc_prnt (message):
     text_queue.put(('prnt', (message, None)))
