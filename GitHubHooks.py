@@ -160,6 +160,17 @@ class GitHubHooks:
         return ret + '.'
 
     def status (self, headers, body):
+        if body['context'] == 'continuous-integration/travis-ci/push':
+            ret = 'Travis CI build for %s ' % C.Gray ( body['sha'][:7] )
+            if   body['state'] == 'success': ret += C.Green('passed')
+            elif body['state'] == 'pending': ret += 'is pending'
+            elif body['state'] == 'error':   ret += C.Red('failed')
+            else:
+                ret += 'is `%s`' % body['state']
+                logging.warning('GitHubHooks.status | unknown state `%s`' % body['state'])
+            ret += 'Commit: %s | Build: %s' % ( C.Blue ( URLShortener.short( body['commit']['html_url'] ), False ) ,
+                                                C.Blue ( URLShortener.short( body['target_url'] ), False ) )
+            return ret
         logging.warning('GitHubHooks.status')
         return ''
 
