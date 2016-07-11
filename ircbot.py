@@ -31,6 +31,7 @@ import sys
 import irclib
 from irclib import nm_to_n
 
+
 class SingleServerIRCBot(irclib.SimpleIRCClient):
     """A single-server IRC bot class.
 
@@ -41,7 +42,8 @@ class SingleServerIRCBot(irclib.SimpleIRCClient):
     have operator or voice modes.  The "database" is kept in the
     self.channels attribute, which is an IRCDict of Channels.
     """
-    def __init__(self, server_list, nickname, realname, reconnection_interval=60):
+    def __init__(self, server_list, nickname, realname,
+                 reconnection_interval=60):
         """Constructor for SingleServerIRCBot objects.
 
         Arguments:
@@ -235,7 +237,8 @@ class SingleServerIRCBot(irclib.SimpleIRCClient):
             if len(e.arguments()) > 1:
                 c.ctcp_reply(nm_to_n(e.source()),
                              "PING " + e.arguments()[1])
-        elif e.arguments()[0] == "DCC" and e.arguments()[1].split(" ", 1)[0] == "CHAT":
+        elif e.arguments()[0] == "DCC" \
+                and e.arguments()[1].split(" ", 1)[0] == "CHAT":
             self.on_dccchat(c, e)
 
     def on_dccchat(self, c, e):
@@ -371,6 +374,7 @@ class Channel(object):
     def has_key(self):
         return self.has_mode("k")
 
+
 # from jaraco.util.dictlib
 class KeyTransformingDict(dict):
     """
@@ -407,11 +411,13 @@ class KeyTransformingDict(dict):
 
     def setdefault(self, key, *args, **kwargs):
         key = self.key_transform(key)
-        return super(KeyTransformingDict, self).setdefault(key, *args, **kwargs)
+        return super(KeyTransformingDict, self).setdefault(key, *args,
+                                                           **kwargs)
 
     def pop(self, key, *args, **kwargs):
         key = self.key_transform(key)
         return super(KeyTransformingDict, self).pop(key, *args, **kwargs)
+
 
 class IRCDict(KeyTransformingDict):
     """
