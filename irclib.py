@@ -97,6 +97,7 @@ DEBUG = False
 # ERROR from the server triggers the error event and the disconnect event.
 # dropping of the connection triggers the disconnect event.
 
+
 class IRCError(Exception):
     """Represents an IRC exception."""
     pass
@@ -218,7 +219,7 @@ class IRC(object):
         at the process_forever method.
         """
         sockets = map(lambda x: x._get_socket(), self.connections)
-        sockets = filter(lambda x: x != None, sockets)
+        sockets = filter(lambda x: x is not None, sockets)
         if sockets:
             (i, o, e) = select.select(sockets, [], [], timeout)
             self.process_data(i)
@@ -264,7 +265,7 @@ class IRC(object):
         number is highest priority).  If a handler function returns
         "NO MORE", no more handlers will be called.
         """
-        if not event in self.handlers:
+        if event not in self.handlers:
             self.handlers[event] = []
         bisect.insort(self.handlers[event], ((priority, handler)))
 
@@ -278,7 +279,7 @@ class IRC(object):
 
         Returns 1 on success, otherwise 0.
         """
-        if not event in self.handlers:
+        if event not in self.handlers:
             return 0
         for h in self.handlers[event]:
             if handler == h[1]:
@@ -352,6 +353,7 @@ class IRC(object):
         if self.fn_to_remove_socket:
             self.fn_to_remove_socket(connection._get_socket())
 
+
 class DelayedCommand(datetime.datetime):
     """
     A command to be executed after some delay (seconds or timedelta).
@@ -360,9 +362,10 @@ class DelayedCommand(datetime.datetime):
         if not isinstance(delay, datetime.timedelta):
             delay = datetime.timedelta(seconds=delay)
         at = datetime.datetime.utcnow() + delay
-        cmd = datetime.datetime.__new__(DelayedCommand, at.year,
-            at.month, at.day, at.hour, at.minute, at.second,
-            at.microsecond, at.tzinfo)
+        cmd = datetime.datetime.__new__(
+                DelayedCommand, at.year,
+                at.month, at.day, at.hour, at.minute, at.second,
+                at.microsecond, at.tzinfo)
         cmd.delay = delay
         cmd.function = function
         cmd.arguments = arguments
@@ -382,6 +385,7 @@ class DelayedCommand(datetime.datetime):
     def due(self):
         return datetime.datetime.utcnow() >= self
 
+
 class PeriodicCommand(DelayedCommand):
     """
     Like a deferred command, but expect this command to run every delay
@@ -389,9 +393,12 @@ class PeriodicCommand(DelayedCommand):
     """
     def next(self):
         return PeriodicCommand(self.delay, self.function,
-            self.arguments)
+                               self.arguments)
 
-_rfc_1459_command_regexp = re.compile("^(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<argument> .+))?")
+
+_rfc_1459_command_regexp = re.compile(
+        "^(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<argument> .+))?")
+
 
 class Connection(object):
     """Base class for IRC connections.
@@ -405,7 +412,7 @@ class Connection(object):
         raise IRCError("Not overridden")
 
     ##############################
-    ### Convenience wrappers.
+    # Convenience wrappers.
 
     def execute_at(self, at, function, arguments=()):
         self.irclibobj.execute_at(at, function, arguments)
@@ -416,8 +423,10 @@ class Connection(object):
     def execute_every(self, period, function, arguments=()):
         self.irclibobj.execute_every(period, function, arguments)
 
+
 class ServerConnectionError(IRCError):
     pass
+
 
 class ServerNotConnectedError(ServerConnectionError):
     pass
@@ -426,6 +435,7 @@ class ServerNotConnectedError(ServerConnectionError):
 # Huh!?  Crrrrazy EFNet doesn't follow the RFC: their ircd seems to
 # use \n as message separator!  :P
 _linesep_regexp = re.compile("\r?\n")
+
 
 class ServerConnection(Connection):
     """This class represents an IRC server connection.
@@ -441,7 +451,8 @@ class ServerConnection(Connection):
         self.ssl = None
 
     def connect(self, server, port, nickname, password=None, username=None,
-                ircname=None, localaddress="", localport=0, ssl=False, ipv6=False):
+                ircname=None, localaddress="", localport=0, ssl=False,
+                ipv6=False):
         """Connect/reconnect to a server.
 
         Arguments:
@@ -552,7 +563,8 @@ class ServerConnection(Connection):
             if self.ssl:
                 new_data = self.ssl.read(2 ** 14)
             else:
-                new_data = self.socket.recv(2 ** 14).decode('utf-8')        # decode utf-8 ajouté
+                # decode utf-8 ajouté
+                new_data = self.socket.recv(2 ** 14).decode('utf-8')
         except socket.error:
             # The server hung up.
             self.disconnect("Connection reset by peer")
@@ -623,7 +635,7 @@ class ServerConnection(Connection):
                         command = "privnotice"
 
                 for m in messages:
-                    if type(m) is types.TupleType:
+                    if isinstance(m, tuple):
                         if command in ["privmsg", "pubmsg"]:
                             command = "ctcp"
                         else:
@@ -631,15 +643,18 @@ class ServerConnection(Connection):
 
                         m = list(m)
                         if DEBUG:
-                            print "command: %s, source: %s, target: %s, arguments: %s" % (
-                                command, prefix, target, m)
+                            print("command: %s, source: %s, target: %s, "
+                                  "arguments: %s"
+                                  % (command, prefix, target, m))
                         self._handle_event(Event(command, prefix, target, m))
                         if command == "ctcp" and m[0] == "ACTION":
-                            self._handle_event(Event("action", prefix, target, m[1:]))
+                            self._handle_event(Event("action", prefix, target,
+                                                     m[1:]))
                     else:
                         if DEBUG:
-                            print "command: %s, source: %s, target: %s, arguments: %s" % (
-                                command, prefix, target, [m])
+                            print("command: %s, source: %s, target: %s, "
+                                  "arguments: %s"
+                                  % (command, prefix, target, [m]))
                         self._handle_event(Event(command, prefix, target, [m]))
             else:
                 target = None
@@ -657,8 +672,8 @@ class ServerConnection(Connection):
                         command = "umode"
 
                 if DEBUG:
-                    print "command: %s, source: %s, target: %s, arguments: %s" % (
-                        command, prefix, target, arguments)
+                    print "command: %s, source: %s, target: %s, arguments: %s"\
+                          % (command, prefix, target, arguments)
                 self._handle_event(Event(command, prefix, target, arguments))
 
     def _handle_event(self, event):
@@ -700,7 +715,8 @@ class ServerConnection(Connection):
     def ctcp(self, ctcptype, target, parameter=""):
         """Send a CTCP command."""
         ctcptype = ctcptype.upper()
-        self.privmsg(target, "\001%s%s\001" % (ctcptype, parameter and (" " + parameter) or ""))
+        self.privmsg(target, "\001%s%s\001"
+                     % (ctcptype, parameter and (" " + parameter) or ""))
 
     def ctcp_reply(self, target, parameter):
         """Send a CTCP REPLY command."""
@@ -754,7 +770,8 @@ class ServerConnection(Connection):
 
     def kick(self, channel, nick, comment=""):
         """Send a KICK command."""
-        self.send_raw("KICK %s %s%s" % (channel, nick, (comment and (" :" + comment))))
+        self.send_raw("KICK %s %s%s"
+                      % (channel, nick, (comment and (" :" + comment))))
 
     def links(self, remote_server="", server_mask=""):
         """Send a LINKS command."""
@@ -788,7 +805,8 @@ class ServerConnection(Connection):
 
     def names(self, channels=None):
         """Send a NAMES command."""
-        self.send_raw("NAMES" + (channels and (" " + ",".join(channels)) or ""))
+        self.send_raw("NAMES"
+                      + (channels and (" " + ",".join(channels)) or ""))
 
     def nick(self, newnick):
         """Send a NICK command."""
@@ -810,7 +828,8 @@ class ServerConnection(Connection):
             'PART',
             ','.join(channels),
         ]
-        if message: cmd_parts.append(message)
+        if message:
+            cmd_parts.append(message)
         self.send_raw(' '.join(cmd_parts))
 
     def pass_(self, password):
@@ -852,7 +871,8 @@ class ServerConnection(Connection):
             if self.ssl:
                 self.ssl.write(string + "\r\n")
             else:
-                self.socket.send(string.encode('utf-8') + "\r\n")      # encode utf-8 ajouté
+                # encode utf-8 ajouté
+                self.socket.send(string.encode('utf-8') + "\r\n")
             if DEBUG:
                 print "TO SERVER:", string
         except socket.error:
@@ -915,6 +935,7 @@ class ServerConnection(Connection):
         self.send_raw("WHOWAS %s%s%s" % (nick,
                                          max and (" " + max),
                                          server and (" " + server)))
+
 
 class DCCConnectionError(IRCError):
     pass
@@ -1020,7 +1041,7 @@ class DCCConnection(Connection):
             return
 
         try:
-            new_data = self.socket.recv(2 ** 14)#.decode('utf-8')          # decode utf-8 ajouté
+            new_data = self.socket.recv(2 ** 14)
         except socket.error:
             # The server hung up.
             self.disconnect("Connection reset by peer")
@@ -1070,7 +1091,7 @@ class DCCConnection(Connection):
         CHAT session.
         """
         try:
-            self.socket.send(string)#.encode('utf-8'))        # encode utf-8 ajouté
+            self.socket.send(string)
             if self.dcctype == "chat":
                 self.socket.send("\n")
             if DEBUG:
@@ -1078,6 +1099,7 @@ class DCCConnection(Connection):
         except socket.error:
             # Ouch!
             self.disconnect("Connection reset by peer.")
+
 
 class SimpleIRCClient(object):
     """A simple single-server IRC client class.
@@ -1105,7 +1127,8 @@ class SimpleIRCClient(object):
         self.connection = self.ircobj.server()
         self.dcc_connections = []
         self.ircobj.add_global_handler("all_events", self._dispatcher, -10)
-        self.ircobj.add_global_handler("dcc_disconnect", self._dcc_disconnect, -10)
+        self.ircobj.add_global_handler("dcc_disconnect", self._dcc_disconnect,
+                                       -10)
 
     def _dispatcher(self, c, e):
         """[Internal]"""
@@ -1120,7 +1143,8 @@ class SimpleIRCClient(object):
         self.dcc_connections.remove(c)
 
     def connect(self, server, port, nickname, password=None, username=None,
-                ircname=None, localaddress="", localport=0, ssl=False, ipv6=False):
+                ircname=None, localaddress="", localport=0, ssl=False,
+                ipv6=False):
         """Connect/reconnect to a server.
 
         Arguments:
@@ -1234,6 +1258,7 @@ _low_level_mapping = {
 
 _low_level_regexp = re.compile(_LOW_LEVEL_QUOTE + "(.)")
 
+
 def mask_matches(nick, mask):
     """Check if a nick matches a mask.
 
@@ -1251,6 +1276,7 @@ def mask_matches(nick, mask):
 
 _special = "-[]\\`^{}"
 nick_characters = string.ascii_letters + string.digits + _special
+
 
 def _ctcp_dequote(message):
     """[Internal] Dequote a message according to CTCP specifications.
@@ -1306,12 +1332,14 @@ def _ctcp_dequote(message):
 
         return messages
 
+
 def is_channel(string):
     """Check if a string is a channel name.
 
     Returns true if the argument is a channel name, otherwise false.
     """
     return string and string[0] in "#&+!"
+
 
 def ip_numstr_to_quad(num):
     """Convert an IP number as an integer given in ASCII
@@ -1321,6 +1349,7 @@ def ip_numstr_to_quad(num):
     p = map(str, map(int, [n >> 24 & 0xFF, n >> 16 & 0xFF,
                            n >> 8 & 0xFF, n & 0xFF]))
     return ".".join(p)
+
 
 def ip_quad_to_numstr(quad):
     """Convert an IP address string (e.g. '192.168.0.1') to an IP
@@ -1332,12 +1361,14 @@ def ip_quad_to_numstr(quad):
         s = s[:-1]
     return s
 
+
 def nm_to_n(s):
     """Get the nick part of a nickmask.
 
     (The source of an Event is a nickmask.)
     """
     return s.split("!")[0]
+
 
 def nm_to_uh(s):
     """Get the userhost part of a nickmask.
@@ -1346,12 +1377,14 @@ def nm_to_uh(s):
     """
     return s.split("!")[1]
 
+
 def nm_to_h(s):
     """Get the host part of a nickmask.
 
     (The source of an Event is a nickmask.)
     """
     return s.split("@")[1]
+
 
 def nm_to_u(s):
     """Get the user part of a nickmask.
@@ -1360,6 +1393,7 @@ def nm_to_u(s):
     """
     s = s.split("!")[1]
     return s.split("@")[0]
+
 
 def parse_nick_modes(mode_string):
     """Parse a nick mode string.
@@ -1376,6 +1410,7 @@ def parse_nick_modes(mode_string):
 
     return _parse_modes(mode_string, "")
 
+
 def parse_channel_modes(mode_string):
     """Parse a channel mode string.
 
@@ -1390,6 +1425,7 @@ def parse_channel_modes(mode_string):
     """
 
     return _parse_modes(mode_string, "bklvo")
+
 
 def _parse_modes(mode_string, unary_modes=""):
     """[Internal]"""
@@ -1421,6 +1457,7 @@ def _parse_modes(mode_string, unary_modes=""):
         else:
             modes.append([sign, ch, None])
     return modes
+
 
 def _ping_ponger(connection, event):
     """[Internal]"""
@@ -1617,6 +1654,7 @@ protocol_events = [
 
 all_events = generated_events + protocol_events + numeric_events.values()
 
+
 # from jaraco.util.itertools
 def always_iterable(item):
     """
@@ -1635,6 +1673,7 @@ def always_iterable(item):
     if isinstance(item, basestring) or not hasattr(item, '__iter__'):
         item = item,
     return item
+
 
 # from jaraco.util.string
 class FoldedCase(str):
@@ -1685,6 +1724,7 @@ class FoldedCase(str):
         pattern = re.compile(re.escape(splitter), re.I)
         return pattern.split(self, maxsplit)
 
+
 class IRCFoldedCase(FoldedCase):
     """
     A version of FoldedCase that honors the IRC specification for lowercased
@@ -1703,9 +1743,11 @@ class IRCFoldedCase(FoldedCase):
     def lower(self):
         return self.translate(self.translation)
 
+
 # for compatibility
 def irc_lower(str):
     return IRCFoldedCase(str).lower()
+
 
 def total_seconds(td):
     """
@@ -1715,5 +1757,6 @@ def total_seconds(td):
     try:
         result = td.total_seconds()
     except AttributeError:
-        result = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+        result = (td.microseconds
+                  + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
     return result
