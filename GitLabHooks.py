@@ -53,7 +53,7 @@ def push(headers, body):
                  C.Blue(URLShortener.short("%s/compare/%s...%s"
                         % (body['repository']['homepage'],
                            body['before'],
-                           body['after']), False)))
+                           body['after'])), False))
         if len(body['commits']) > max_commits_shown:
             ret += '\nHere are the last %d:' % (max_commits_shown,)
         for commit in body['commits'][-max_commits_shown:]:
@@ -97,5 +97,5 @@ def merge_request(headers, body):
                C.Blue(URLShortener.short(
                           "%s/merge_requests/%d"
                           % (body['object_attributes']['target']['http_url'],
-                             body['object_attributes']['id']),
-                      False)))
+                             body['object_attributes']['id'])),
+                      False))
