@@ -20,8 +20,15 @@ import URLShortener
 import logging
 
 
-def strip_repo(repo):
+def _strip_repo(repo):
     return('/'.join(repo.split('/')[-2:]))
+
+
+def _preterit(verb):
+    if verb in ['open', 'reopen']:
+        return "%sed" % verb
+    else:
+        return "%sd" % verb
 
 
 def handle(headers, body):
@@ -46,7 +53,7 @@ def push(headers, body):
     max_commits_shown = 5
     if body['commits']:
         ret = '[%s] %s pushed %s commits to %s. (%s)' \
-              % (C.Pink(strip_repo(body['repository']['homepage'])),
+              % (C.Pink(_strip_repo(body['repository']['homepage'])),
                  C.Cyan(body['user_name']),
                  C.Bold(len(body['commits'])),
                  C.Red(body['ref'].split('/')[-1]),
@@ -68,18 +75,14 @@ def push(headers, body):
 
 def tag(headers, body):
     return '[%s] %s added the tag %s.' \
-            % (C.Pink(strip_repo(body['repository']['homepage'])),
+            % (C.Pink(_strip_repo(body['repository']['homepage'])),
                C.Cyan(body['user_name']),
                C.Red(body['ref'].split('/')[-1]))
 
 
 def issues(headers, body):
     ret = '%s %s' % (C.Cyan(body['user']['name']),  # user / username ?
-                     body['object_attributes']['action'])
-    if body['object_attributes']['action'] in ['open', 'reopen']:
-        ret += 'ed'
-    else:
-        ret += 'd'
+                     _preterit(body['object_attributes']['action']))
     ret += ' issue %s. (%s)' \
            % (C.Gray('#%d' % body['object_attributes']['iid']),
               C.Blue(URLShortener.short(body['object_attributes']['url']),
@@ -89,10 +92,10 @@ def issues(headers, body):
 
 def merge_request(headers, body):
     return '[%s] %s %s merge request %s. (%s)' \
-            % (C.Pink(strip_repo(
+            % (C.Pink(_strip_repo(
                    body['object_attributes']['target']['http_url'])),
                C.Cyan(body['user']['name']),
-               body['object_attributes']['state'],
+               _preterit(body['object_attributes']['action']),
                C.Bold(body['object_attributes']['id']),
                C.Blue(URLShortener.short(
                           "%s/merge_requests/%d"
