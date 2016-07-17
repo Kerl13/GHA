@@ -20,8 +20,9 @@ Try `./GHA.py --help`. You should see something like
 
     usage: ./GHA.py [-h] [-lh LISTEN_HOST] [-lp LISTEN_PORT] [-ih IRC_HOST]
                     [-ip IRC_PORT] [-ic [IRC_CHANS [IRC_CHANS ...]]]
-                    [-in IRC_NAME] [-ea FILE] [-ia FILE]
-    
+                    [-in IRC_NAME] [-ea FILE] [-ia FILE] [--write-pid FILE]
+                    [-re NICK]
+
     Github Announcer
     
     optional arguments:
@@ -42,6 +43,8 @@ Try `./GHA.py --help`. You should see something like
                             export arguments in the given file
       -ia FILE, --import-arguments FILE
                             import arguments from the given file
+      -re NICK, --report-errors NICK
+			    Report errors to the given person
     
 A simple case to get started:
 
@@ -49,6 +52,8 @@ A simple case to get started:
 
 This will create the file `my.cnf` containing the configuration for a GitHub Announcer listening on `0.0.0.0:9090`, and connected on `irc.freenode.net/6667` on channel `#GHA`.
 You can change the listening host with `-lh`, the IRC port with `-ip`, the IRC name of the bot with `-in`.
+You can tell GHA to report error messages to a specific personne using the `-re`
+option.
 Note that the channel list must be quoted, since `#` is a special character in shell.
 
 After that, you just need to use:

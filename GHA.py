@@ -79,6 +79,7 @@ parser.add_argument('--write-pid',
                     help='write all threads pids in given file')
 
 parser.add_argument('-re', '--report-errors',
+                    metavar='NICK',
                     type=str,
                     help='Report errors to the given person')
 
