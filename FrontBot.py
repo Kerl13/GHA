@@ -187,22 +187,22 @@ class Color:
     A little class for IRC colors.
     '''
 
-    #           = 14
-    #           = 15
-    #           = 16
-    gray = 17
-    blue = 18
-    green = 19
-    orange = 20
-    red = 21
-    purple = 22
-    brown = 23
-    yellow = 24
-    light_green = 25
-    #           = 26
-    cyan = 27
-    #           = 28
-    pink = 29
+    white = 0
+    black = 1
+    blue = 2
+    green = 3
+    light_red = 4
+    brown = 5
+    purple = 6
+    orange = 7
+    yellow = 8
+    light_green = 9
+    cyan = 10
+    light_cyan = 11
+    light_blue = 12
+    pink = 13
+    grey = 14
+    light_grey = 15
 
     bold = 'bold'
 
