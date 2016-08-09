@@ -56,7 +56,7 @@ def push(headers, body):
               % (C.Pink(_strip_repo(body['repository']['homepage'])),
                  C.Cyan(body['user_name']),
                  C.Bold(len(body['commits'])),
-                 C.Red(body['ref'].split('/')[-1]),
+                 C.LightRed(body['ref'].split('/')[-1]),
                  C.Blue(URLShortener.short("%s/compare/%s...%s"
                         % (body['repository']['homepage'],
                            body['before'],
@@ -77,7 +77,7 @@ def tag(headers, body):
     return '[%s] %s added the tag %s.' \
             % (C.Pink(_strip_repo(body['repository']['homepage'])),
                C.Cyan(body['user_name']),
-               C.Red(body['ref'].split('/')[-1]))
+               C.LightRed(body['ref'].split('/')[-1]))
 
 
 def issues(headers, body):

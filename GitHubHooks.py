@@ -50,12 +50,12 @@ class GitHubHooks:
         else:
             return '%s created the %s %s.' % (C.Cyan(body['sender']['login']),
                                               body['ref_type'],
-                                              C.Red(body['ref']))
+                                              C.LightRed(body['ref']))
 
     def delete(self, headers, body):
         return '%s deleted the %s %s.' % (C.Cyan(body['sender']['login']),
                                           body['ref_type'],
-                                          C.Red(body['ref']))
+                                          C.LightRed(body['ref']))
 
     def deployment(self, headers, body):
         logging.warning('GitHubHooks.deployment')
@@ -160,7 +160,7 @@ class GitHubHooks:
             string = '%s pushed %s commits to %s. (%s)' \
                 % (C.Cyan(body['pusher']['name']),
                    C.Bold(len(body['commits'])),
-                   C.Red(body['ref'].split('/')[-1]),
+                   C.LightRed(body['ref'].split('/')[-1]),
                    C.Blue(URLShortener.short(body['compare']), False))
             if len(body['commits']) > max_commits_shown:
                 string += ('\nHere are the last %d:' % (max_commits_shown,))
@@ -179,7 +179,7 @@ class GitHubHooks:
         ret = '%s %s the release %s' \
                 % (C.Cyan(body['release']['author']['login']),
                    body['action'],
-                   C.Red(body['release']['tag_name']))
+                   C.LightRed(body['release']['tag_name']))
         if body['release']['name']:
             ret += ': ' + body['release']['name']
         return ret + '.'
@@ -192,7 +192,7 @@ class GitHubHooks:
             elif body['state'] == 'pending':
                 ret += 'is pending'
             elif body['state'] == 'error':
-                ret += C.Red('failed')
+                ret += C.LightRed('failed')
             else:
                 ret += 'is `%s`' % body['state']
                 logging.warning('GitHubHooks.status | unknown state `%s`'
