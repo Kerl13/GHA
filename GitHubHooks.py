@@ -134,7 +134,7 @@ class GitHubHooks:
         return '%s pinged me.' % body['sender']['login']
 
     def public(self, headers, body):
-        return '%s made this repository public.' \
+        return '%s made the repository public.' \
                 % (C.Cyan(body['sender']['login']))
 
     def pull_request(self, headers, body):
@@ -210,7 +210,7 @@ class GitHubHooks:
         return ''
 
     def watch(self, headers, body):
-        return '%s just watched this repository.' \
+        return '%s just starred the repository.' \
                 % C.Cyan(body['sender']['login'])
 
 
