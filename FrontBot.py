@@ -214,8 +214,8 @@ class Color:
 
     # Please, I want to do that dynamically =(
 
-    def Red(self, string, bold=True):
-        c = self._colorize(self.red, string)
+    def LightRed(self, string, bold=True):
+        c = self._colorize(self.light_red, string)
         if not bold:
             c = '%c%s%c' % (2, c, 2)
         return c
