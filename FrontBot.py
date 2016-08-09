@@ -201,8 +201,8 @@ class Color:
     light_cyan = 11
     light_blue = 12
     pink = 13
-    grey = 14
-    light_grey = 15
+    gray = 14
+    light_gray = 15
 
     bold = 'bold'
 
@@ -246,6 +246,12 @@ class Color:
 
     def Green(self, string, bold=True):
         c = self._colorize(self.green, string)
+        if not bold:
+            c = '%c%s%c' % (2, c, 2)
+        return c
+
+    def LightGray(self, string, bold=True):
+        c = self._colorize(self.light_gray, string)
         if not bold:
             c = '%c%s%c' % (2, c, 2)
         return c
