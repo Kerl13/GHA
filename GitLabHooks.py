@@ -83,8 +83,9 @@ def tag(headers, body):
 def issues(headers, body):
     ret = '%s %s' % (C.Cyan(body['user']['name']),  # user / username ?
                      _preterit(body['object_attributes']['action']))
-    ret += ' issue %s. (%s)' \
+    ret += ' issue %s: %s. (%s)' \
            % (C.Gray('#%d' % body['object_attributes']['iid']),
+              body['object_attributes']['title'],
               C.Blue(URLShortener.short(body['object_attributes']['url']),
                      False))
     return ret
