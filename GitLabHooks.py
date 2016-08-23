@@ -91,11 +91,12 @@ def issues(headers, body):
 
 
 def merge_request(headers, body):
-    return '[%s] %s %s merge request %s. (%s)' \
+    return '[%s] %s %s merge request %s: %s. (%s)' \
             % (C.Pink(_strip_repo(
                    body['object_attributes']['target']['web_url'])),
                C.Cyan(body['user']['name']),
                _preterit(body['object_attributes']['action']),
                C.Bold(body['object_attributes']['iid']),
+               C.Bold(body['merge_request']['title']),
                C.Blue(URLShortener.short(body['object_attributes']['url']),
                       False))
