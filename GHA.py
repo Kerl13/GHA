@@ -78,6 +78,11 @@ parser.add_argument('--write-pid',
                     type=str,
                     help='write all threads pids in given file')
 
+parser.add_argument('-re', '--report-errors',
+                    metavar='NICK',
+                    type=str,
+                    help='Report errors to the given person')
+
 ARGS = parser.parse_args()
 
 if ARGS.import_arguments:
@@ -169,7 +174,6 @@ while True:
     (headers, body) = hooks_queue.get()
 
     try:
-
         if 'X-Github-Event' in headers.keys():
             text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
 
@@ -177,6 +181,7 @@ while True:
             text_queue.put(('prnt', (GitLabHooks.handle(headers, body),)))
 
     except:
-        for line in format_exc().split('\n'):
-            if line:
-                text_queue.put(('prnt', (line, ['niols'])))
+        if ARGS.report_errors:
+            for line in format_exc().split('\n'):
+                if line:
+                    text_queue.put(('prnt', (line, [ARGS.report_errors])))
