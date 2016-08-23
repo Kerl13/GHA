@@ -97,6 +97,6 @@ def merge_request(headers, body):
                C.Cyan(body['user']['name']),
                _preterit(body['object_attributes']['action']),
                C.Bold(body['object_attributes']['iid']),
-               C.Bold(body['merge_request']['title']),
+               C.Bold(body['object_attributes']['title']),
                C.Blue(URLShortener.short(body['object_attributes']['url']),
                       False))
