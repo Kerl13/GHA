@@ -13,7 +13,7 @@ class RichTextMixin():
     TEMPLATE = ""
 
     def render_simple(self):
-        return self.get_template().format(**self.get_context())
+        return self._get_template().format(**self.get_context())
 
     def render_irccolors(self):
         template = self.get_template()

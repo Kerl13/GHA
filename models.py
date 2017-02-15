@@ -74,7 +74,7 @@ class Push(Event, RichTextMixin):
         self.url = url
 
     def get_context(self):
-        context = super(RichTextMixin, self).get_context()
+        context = RichTextMixin.get_context(self)
         context["nb"] = len(self.commits)
         return context
 
@@ -89,7 +89,7 @@ class Tag(Event, RichTextMixin):
 
 class Issue(Event, RichTextMixin):
     TEMPLATE = (
-        "[{project}] {user} {action} issue #{id}: {title}. ({url})\n{commits}"
+        "[{project}] {user} {action} issue #{id}: {title}. ({url})"
     )
 
     def __init__(self, id, title, action, url, **kwargs):
