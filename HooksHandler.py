@@ -45,5 +45,5 @@ class HooksHandlerThread(Process):
 
         try:
             self.app.run(host=self.host, port=self.port, quiet=True)
-        except Exception, ex:
+        except Exception as ex:
             logging.critical('Error while starting server: %s', str(ex))
