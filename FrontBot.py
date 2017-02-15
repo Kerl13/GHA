@@ -14,11 +14,10 @@
 #                                                                             #
 ###############################################################################
 
-import ircbot
-import irclib
+from irc.bot import SingleServerIRCBot
 import logging
 from multiprocessing import Process, Queue
-from Queue import Empty
+from queue import Empty
 from traceback import format_exc
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
@@ -44,21 +43,19 @@ these checks.
 TIME_BETWEEN_QUEUE_CHECKS = 0.1
 
 
-class FrontBot(ircbot.SingleServerIRCBot):
-
-    '''
+class FrontBot(SingleServerIRCBot):
+    """
     This IRC bot's job is only to be an interface between IRC and a python
     script.  It communicates through self for multiprocessing queues, so that
-    you can safely use threads.  Since the IRC bot is busy communicating with
+    you can safely use threads. Since the IRC bot is busy communicating with
     the IRC server, you can't just call one of his methods. You have to put a
     dictionnary {'method', 'args'} in (one of) the input queues, and the bot
     will do the job.
-    '''
+    """
 
     def __init__(self, server='localhost', port=6667, chans=[],
                  name='FrontBot', input_queues=[], output_queues=[]):
-        ircbot.SingleServerIRCBot.__init__(self, [(server, port)], name, name,
-                                           10)
+        super().__init__([(server, port)], name, name, 10)
         self.chans = chans
         self.name = name
         self.input_queues = input_queues
@@ -95,8 +92,8 @@ class FrontBot(ircbot.SingleServerIRCBot):
             logging.warning('_prnt: Uncaught exception')
             for line in format_exc().split('\n'):
                 logging.warning(line)
-        irclib.ServerConnection.execute_delayed(
-                self.serv, TIME_BETWEEN_MESSAGES, self._prnt, (chan,))
+        # irclib.ServerConnection.execute_delayed(
+        #         self.serv, TIME_BETWEEN_MESSAGES, self._prnt, (chan,))
 
     def prnt(self, message, chans=None):
         '''
@@ -148,8 +145,8 @@ class FrontBot(ircbot.SingleServerIRCBot):
 
     def _check_queue(self, queue):
         try:
-            e = queue.get_nowait()
-            getattr(self, e[0])(*e[1])
+            meth, message = queue.get_nowait()
+            getattr(self, meth)(message)
         except Empty:
             pass
         except:
@@ -157,9 +154,9 @@ class FrontBot(ircbot.SingleServerIRCBot):
             for line in format_exc().split('\n'):
                 if line:
                     logging.warning(line)
-        irclib.ServerConnection.execute_delayed(self.serv,
-                                                TIME_BETWEEN_QUEUE_CHECKS,
-                                                self._check_queue, (queue,))
+        # irclib.ServerConnection.execute_delayed(self.serv,
+        #                                         TIME_BETWEEN_QUEUE_CHECKS,
+        #                                         self._check_queue, (queue,))
 
 
 class FrontBotThread(Process):
