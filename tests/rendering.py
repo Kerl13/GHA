@@ -44,7 +44,7 @@ class TestSimpleRendering(unittest.TestCase):
             project=self.project,
             id=42,
             title="Wrong encoding",
-            action="open",
+            action="opened",
             url="http://bugtracker.example.com/issue/42"
         )
         self.assertEqual(
@@ -59,7 +59,7 @@ class TestSimpleRendering(unittest.TestCase):
             project=self.project,
             id=5,
             title="Use utf-8",
-            action="update",
+            action="updated",
             url="http://example.com/project/mr/5"
         )
         self.assertEqual(

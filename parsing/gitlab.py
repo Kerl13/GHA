@@ -12,6 +12,13 @@ class UnknownKindError(Exception):
         super().__init__("Unknown gitlab hook kind: {:s}".format(kind))
 
 
+def _preterit(action):
+    if action in ["open"]:
+        return "{}ed".format(action)
+    elif action in ["update", "close"]:
+        return "{}d".format(action)
+
+
 class ParserContext():
     def __init__(self, user=None, project=None):
         self._user = user
@@ -112,7 +119,7 @@ def parse_issue(ctxt, hook):
         project=ctxt.project,
         id=attrs["id"],
         title=attrs["title"],
-        action=attrs["action"],
+        action=_preterit(attrs["action"]),
         url=attrs["url"]
     )
 
@@ -122,7 +129,7 @@ def parse_merge_request(ctxt, hook):
     return MergeRequest(
         id=attrs["id"],
         title=attrs["title"],
-        action=attrs["action"],
+        action=_preterit(attrs["action"]),
         url=attrs["url"],
         user=ctxt.user,
         project=ctxt.project

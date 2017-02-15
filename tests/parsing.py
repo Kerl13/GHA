@@ -45,7 +45,7 @@ class TestGitlabParsing(unittest.TestCase):
         self.assertIsInstance(git_obj, Issue)
         self.assertEqual(git_obj.id, 301)
         self.assertEqual(git_obj.title, "New API: create/update/delete file")
-        self.assertEqual(git_obj.action, "open")
+        self.assertEqual(git_obj.action, "opened")
         self.assertEqual(git_obj.url, "http://example.com/diaspora/issues/23")
 
     def test_merge_request(self):
@@ -53,7 +53,7 @@ class TestGitlabParsing(unittest.TestCase):
         self.assertIsInstance(git_obj, MergeRequest)
         self.assertEqual(git_obj.id, 99)
         self.assertEqual(git_obj.title, "MS-Viewport")
-        self.assertEqual(git_obj.action, "open")
+        self.assertEqual(git_obj.action, "opened")
         self.assertEqual(
             git_obj.url,
             "http://example.com/diaspora/merge_requests/1"
