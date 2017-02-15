@@ -49,25 +49,30 @@ def parse(hook):
     ctxt = ParserContext()
     kind = hook["object_kind"]
     if kind == "push":
-        ctxt.project = Project(name=hook["project"]["name"])
+        parse_project(ctxt, hook["project"])
         ctxt.user = (hook["user_name"], hook["user_email"])
         return parse_push(ctxt, hook)
     elif kind == "tag_push":
-        ctxt.project = Project(name=hook["project"]["name"])
+        parse_project(ctxt, hook["project"])
         ctxt.user = (hook["user_name"], None)
         return parse_tag(ctxt, hook)
     elif kind == "issue":
-        ctxt.project = Project(name=hook["project"]["name"])
+        parse_project(ctxt, hook["project"])
         ctxt.user = (hook["user"]["name"], None)
         return parse_issue(ctxt, hook)
     elif kind == "merge_request":
-        ctxt.project = Project(
-            name=hook["object_attributes"]["target"]["name"]
-        )
+        parse_project(ctxt, hook["object_attributes"]["target"])
         ctxt.user = (hook["user"]["name"], None)
         return parse_merge_request(ctxt, hook)
     else:
         raise UnknownKindError(kind)
+
+
+def parse_project(ctxt, hook):
+    ctxt.project = Project(
+        name=hook["name"],
+        url=hook["web_url"]
+    )
 
 
 def parse_push(ctxt, hook):
