@@ -15,9 +15,8 @@
 ###############################################################################
 
 import logging
-from multiprocessing import Process, Queue
-from Queue import Empty
-from Bottle import Bottle, request, redirect
+from multiprocessing import Process
+from Bottle import Bottle, request
 
 
 class HooksHandlerThread(Process):

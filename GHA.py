@@ -16,15 +16,18 @@
 
 import argparse
 import logging
+import json
 from sys import argv
 from json import loads, dumps
 from os import getpid
+from queue import Queue
+from traceback import format_exc
 
-from FrontBot import *
-from HooksHandler import *
+from FrontBot import FrontBot, FrontBotThread
+from HooksHandler import HooksHandlerThread
 
-from GitHubHooks import *
-import GitLabHooks
+# from GitHubHooks import *
+from parsing.gitlab import parse as gitlab_parse
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
                            'line %(lineno)s | %(message)s',
@@ -175,10 +178,13 @@ while True:
 
     try:
         if 'X-Github-Event' in headers.keys():
-            text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
+            # text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
+            pass
 
         else:
-            text_queue.put(('prnt', (GitLabHooks.handle(headers, body),)))
+            hook = json.loads(body)
+            git_obj = gitlab_parse(hook)
+            text_queue.put(('prnt', git_obj.render_irccolors()))
 
     except:
         if ARGS.report_errors:
