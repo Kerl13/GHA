@@ -72,15 +72,17 @@ class FrontBot(SingleServerIRCBot):
             self._check_queue(input_queue)
 
     def on_pubmsg(self, serv, ev):
-        logging.debug('pubmsg %s/%s: %s', ev.target(), ev.source(),
-                      ev.arguments()[0])
-        if ev.arguments()[0] == self.name+': help':
-            self.prnt(HELP_MESSAGE, ev.target())
+        logging.debug(
+            'pubmsg {}/{}: {}'
+            .format(ev.target, ev.source.nick, ev.arguments[0])
+        )
+        if ev.arguments[0] == self.name+': help':
+            self.prnt(HELP_MESSAGE, ev.target)
 
     def on_privmsg(self, serv, ev):
-        logging.debug('privmsg %s: %s', ev.source(), ev.arguments()[0])
-        if ev.arguments()[0] == self.name+': help':
-            self.prnt(HELP_MESSAGE, ev.source())
+        logging.debug('privmsg %s: %s', ev.source.nick, ev.arguments[0])
+        if ev.arguments[0] == self.name+': help':
+            self.prnt(HELP_MESSAGE, ev.source.nick)
 
     def _prnt(self, chan):
         try:
