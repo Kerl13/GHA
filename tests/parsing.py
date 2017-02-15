@@ -1,6 +1,7 @@
 import unittest
 import os
 import json
+import requests
 
 from parsing.gitlab import parse
 from models import Push, Tag, Issue, MergeRequest
@@ -28,11 +29,14 @@ class TestGitlabParsing(unittest.TestCase):
         self.assertIsInstance(git_obj, Push)
         self.assertEqual(git_obj.branch, "master")
         self.assertEqual(len(git_obj.commits), 2)
+        # The url has been shortened, we have to query it in order to get the
+        # actual url of the event
+        url = requests.get(git_obj.url).url
         self.assertTrue(
             -1
-            < git_obj.url.find(git_obj.project.url)
-            < git_obj.url.find(self.push["before"])
-            < git_obj.url.find(self.push["after"])
+            < url.find(git_obj.project.url)
+            < url.find(self.push["before"])
+            < url.find(self.push["after"])
         )
 
     def test_tag(self):
@@ -46,7 +50,10 @@ class TestGitlabParsing(unittest.TestCase):
         self.assertEqual(git_obj.id, 301)
         self.assertEqual(git_obj.title, "New API: create/update/delete file")
         self.assertEqual(git_obj.action, "opened")
-        self.assertEqual(git_obj.url, "http://example.com/diaspora/issues/23")
+        # The url has been shortened, we have to query it in order to get the
+        # actual url of the event
+        url = requests.get(git_obj.url).url
+        self.assertEqual(url, "http://example.com/diaspora/issues/23")
 
     def test_merge_request(self):
         git_obj = parse(self.merge_request)
@@ -54,7 +61,10 @@ class TestGitlabParsing(unittest.TestCase):
         self.assertEqual(git_obj.id, 99)
         self.assertEqual(git_obj.title, "MS-Viewport")
         self.assertEqual(git_obj.action, "opened")
+        # The url has been shortened, we have to query it in order to get the
+        # actual url of the event
+        url = requests.get(git_obj.url).url
         self.assertEqual(
-            git_obj.url,
+            url,
             "http://example.com/diaspora/merge_requests/1"
         )

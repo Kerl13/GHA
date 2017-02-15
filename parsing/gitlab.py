@@ -3,7 +3,7 @@ This module performs the parsing of Gitlab's hooks and internalizes them
 using the classes described in ``models.py``.
 """
 
-
+import URLShortener
 from models import User, Project, Push, Tag, Commit, Issue, MergeRequest
 
 
@@ -88,17 +88,19 @@ def parse_push(ctxt, hook):
         Commit(
             id=commit["id"],
             message=commit["message"],
-            url=commit["url"],
+            url=URLShortener.short(commit["url"]),
             author=ctxt.get_or_create_user(**commit["author"]),
         ) for commit in hook["commits"]
     ]
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
-        url="{}/compare/{}...{}"
+        url=URLShortener.short(
+            "{}/compare/{}...{}"
             .format(hook["project"]["web_url"],
                     hook["before"],
-                    hook["after"]),
+                    hook["after"])
+        ),
         user=ctxt.user,
         project=ctxt.project,
     )
@@ -120,7 +122,7 @@ def parse_issue(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=attrs["url"]
+        url=URLShortener.short(attrs["url"])
     )
 
 
@@ -130,7 +132,7 @@ def parse_merge_request(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=attrs["url"],
+        url=URLShortener.short(attrs["url"]),
         user=ctxt.user,
         project=ctxt.project
     )
