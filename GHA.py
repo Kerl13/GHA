@@ -14,6 +14,7 @@
 #                                                                             #
 ###############################################################################
 
+# Regular python imports
 import argparse
 import logging
 import json
@@ -22,12 +23,13 @@ from os import getpid
 from multiprocessing import Process, Queue
 from traceback import format_exc
 
-from FrontBot import FrontBot, FrontBotThread
-from HooksHandler import HooksHandlerThread
-
-# from GitHubHooks import *
+# GHA specific imports
 from parsing.gitlab import parse as gitlab_parse
 from parsing.github import parse as github_parse
+
+from entrypoints.web import HooksHandlerThread
+
+from outputs.irc import FrontBot, FrontBotThread
 
 
 class GHA(Process):
