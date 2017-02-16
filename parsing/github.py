@@ -11,8 +11,8 @@
 #                                                                             #
 ###############################################################################
 
-from .common import ParserContext, shorten_url, UnknownKindError
-from models import Project, Commit, Push
+from .common import ParserContext, UnknownKindError
+from models import Project, Commit, Push, Issue, MergeRequest
 
 
 def parse(header, hook):
@@ -28,10 +28,10 @@ def parse(header, hook):
         ctxt.user = (hook["pusher"]["name"], hook["pusher"]["email"])
         return parse_push(ctxt, hook)
     elif kind == "issues":
-        ctxt.user = (hook["user"]["name"], None)
+        ctxt.user = (hook["sender"]["login"], None)
         return parse_issue(ctxt, hook)
     elif kind == "pull_request":
-        ctxt.user = (hook["user"]["name"], None)
+        ctxt.user = (hook["pull_request"]["user"]["login"], None)
         return parse_merge_request(ctxt, hook)
     else:
         raise UnknownKindError("Github", kind)
@@ -50,24 +50,40 @@ def parse_push(ctxt, hook):
             id=commit["id"],
             message=commit["message"],
             url=commit["url"],
-            author=ctxt.get_or_create_user((
+            author=ctxt.get_or_create_user(
                 commit["committer"]["name"],
                 commit["committer"]["email"]
-            ))
+            )
         ) for commit in hook["commits"]
     ]
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
-        url=shorten_url(hook["compare"]),
+        url=hook["compare"],
         user=ctxt.user,
         project=ctxt.project
     )
 
 
 def parse_issue(ctxt, hook):
-    raise NotImplementedError
+    issue = hook["issue"]
+    return Issue(
+        user=ctxt.user,
+        project=ctxt.project,
+        id=issue["id"],
+        title=issue["title"],
+        action=hook["action"],
+        url=issue["url"]
+    )
 
 
 def parse_merge_request(ctxt, hook):
-    raise NotImplementedError
+    mr = hook["pull_request"]
+    return MergeRequest(
+        user=ctxt.user,
+        project=ctxt.project,
+        id=mr["id"],
+        title=mr["title"],
+        action=hook["action"],
+        url=mr["html_url"],
+    )

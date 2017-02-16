@@ -1,7 +1,6 @@
 import unittest
 import os
 import json
-import requests
 
 from parsing.gitlab import parse as gitlab_parse
 from parsing.github import parse as github_parse
@@ -35,14 +34,11 @@ class TestGitlabParsing(TestParsing):
         self.assertIsInstance(git_obj, Push)
         self.assertEqual(git_obj.branch, "master")
         self.assertEqual(len(git_obj.commits), 2)
-        # The url has been shortened, we have to query it in order to get the
-        # actual url of the event
-        url = requests.get(git_obj.url).url
         self.assertTrue(
             -1
-            < url.find(git_obj.project.url)
-            < url.find(self.push["before"])
-            < url.find(self.push["after"])
+            < git_obj.url.find(git_obj.project.url)
+            < git_obj.url.find(self.push["before"])
+            < git_obj.url.find(self.push["after"])
         )
 
     def test_tag(self):
@@ -56,10 +52,7 @@ class TestGitlabParsing(TestParsing):
         self.assertEqual(git_obj.id, 301)
         self.assertEqual(git_obj.title, "New API: create/update/delete file")
         self.assertEqual(git_obj.action, "opened")
-        # The url has been shortened, we have to query it in order to get the
-        # actual url of the event
-        url = requests.get(git_obj.url).url
-        self.assertEqual(url, "http://example.com/diaspora/issues/23")
+        self.assertEqual(git_obj.url, "http://example.com/diaspora/issues/23")
 
     def test_merge_request(self):
         git_obj = gitlab_parse(self.merge_request)
@@ -67,11 +60,8 @@ class TestGitlabParsing(TestParsing):
         self.assertEqual(git_obj.id, 99)
         self.assertEqual(git_obj.title, "MS-Viewport")
         self.assertEqual(git_obj.action, "opened")
-        # The url has been shortened, we have to query it in order to get the
-        # actual url of the event
-        url = requests.get(git_obj.url).url
         self.assertEqual(
-            url,
+            git_obj.url,
             "http://example.com/diaspora/merge_requests/1"
         )
 

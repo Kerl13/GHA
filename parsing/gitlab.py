@@ -4,7 +4,7 @@ using the classes described in ``models.py``.
 """
 
 from models import Project, Push, Tag, Commit, Issue, MergeRequest
-from .common import ParserContext, shorten_url, UnknownKindError
+from .common import ParserContext, UnknownKindError
 
 
 def _preterit(action):
@@ -55,14 +55,14 @@ def parse_push(ctxt, hook):
         Commit(
             id=commit["id"],
             message=commit["message"],
-            url=shorten_url(commit["url"]),
+            url=commit["url"],
             author=ctxt.get_or_create_user(**commit["author"]),
         ) for commit in hook["commits"]
     ]
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
-        url=shorten_url(
+        url=(
             "{}/compare/{}...{}"
             .format(hook["project"]["web_url"],
                     hook["before"],
@@ -89,7 +89,7 @@ def parse_issue(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=shorten_url(attrs["url"])
+        url=attrs["url"]
     )
 
 
@@ -99,7 +99,7 @@ def parse_merge_request(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=shorten_url(attrs["url"]),
+        url=attrs["url"],
         user=ctxt.user,
         project=ctxt.project
     )
