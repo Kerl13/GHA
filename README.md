@@ -17,8 +17,9 @@ Get started
 2. Install the dependencies (you may want to use a
    [virtual environment](https://pypi.python.org/pypi/virtualenv))
 
-    pip3 install --upgrade -r requirements.txt
-   
+```
+pip3 install --upgrade -r requirements.txt
+```
 
 Try `./GHA.py --help`. You should see something like
 
