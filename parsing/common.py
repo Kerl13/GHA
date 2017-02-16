@@ -1,4 +1,3 @@
-import requests
 from models import User
 
 
@@ -36,11 +35,3 @@ class ParserContext():
         user = User(name=name, email=email)
         self.users[name] = User(name=name, email=email)
         self._user = user
-
-
-def shorten_url(url):
-    short_url = requests.get(
-        "http://is.gd/create.php",
-        {"format": "simple", "url": url}
-    )
-    return short_url.content.decode("utf-8")

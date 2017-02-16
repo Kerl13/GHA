@@ -1,3 +1,4 @@
+import requests
 import warnings
 from .irc import Color as C, CONFIG
 
@@ -20,6 +21,9 @@ class RichTextMixin():
         context = self.get_context()
         for key, value in context.items():
             if key in CONFIG:
+                # XXX: should be optional
+                if key == "url":
+                    value = shorten_url(value)
                 context[key] = C(value, CONFIG[key])
             else:
                 warnings.warn(
@@ -36,3 +40,11 @@ class RichTextMixin():
 
     def get_context(self):
         return self.__dict__
+
+
+def shorten_url(url):
+    short_url = requests.get(
+        "http://is.gd/create.php",
+        {"format": "simple", "url": url}
+    )
+    return short_url.content.decode("utf-8")

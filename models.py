@@ -17,7 +17,7 @@ This module describes the internal representations of Gitlab's hooks.
 """
 
 
-from writer.mixins import RichTextMixin
+from writer.common import RichTextMixin
 
 
 # ---
