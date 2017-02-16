@@ -54,11 +54,11 @@ class GHA(Process):
 
     def start_ircbot(self):
         bot = FrontBot(
+            self.text_queue,
             self.config.irc_host,
             self.config.irc_port,
             self.config.irc_chans,
-            self.config.irc_name,
-            [self.text_queue]
+            self.config.irc_name
         )
         bot_thread = FrontBotThread(bot)
         bot_thread.start()
@@ -84,7 +84,10 @@ class GHA(Process):
                 else:
                     hook = json.loads(body)
                     git_obj = gitlab_parse(hook)
-                    self.text_queue.put(('prnt', git_obj.render_irccolors()))
+                    self.text_queue.put((
+                        "prnt",
+                        {"message": git_obj.render_irccolors()}
+                    ))
 
             except:
                 if self.config.report_errors:

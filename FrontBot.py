@@ -16,9 +16,8 @@
 
 from irc.bot import SingleServerIRCBot
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from queue import Empty
-from traceback import format_exc
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
 I provide a PrinterBot.prnt method allowing some other python scripts
@@ -53,53 +52,57 @@ class FrontBot(SingleServerIRCBot):
     will do the job.
     """
 
-    def __init__(self, server='localhost', port=6667, chans=[],
-                 name='FrontBot', input_queues=[], output_queues=[]):
+    def __init__(self, input_queue, server='localhost', port=6667, chans=[],
+                 name='FrontBot'):
         super().__init__([(server, port)], name, name, 10)
         self.chans = chans
         self.name = name
-        self.input_queues = input_queues
-        self.output_queues = output_queues
+        self.input_queue = input_queue
         logging.info('Init on %s/%s : %s', server, port, ', '.join(chans))
 
-    def on_welcome(self, serv, ev):
+    def on_welcome(self, connection, event):
         logging.info('Welcomed')
-        self.serv = serv
-        self.chan_queues = {}
         for chan in self.chans:
-            self.serv.join(chan)
-        for input_queue in self.input_queues:
-            self._check_queue(input_queue)
-
-    def on_pubmsg(self, serv, ev):
-        logging.debug(
-            'pubmsg {}/{}: {}'
-            .format(ev.target, ev.source.nick, ev.arguments[0])
+            connection.join(chan)
+        connection.execute_every(
+            TIME_BETWEEN_MESSAGES,
+            self._check_queue
         )
-        if ev.arguments[0] == self.name+': help':
-            self.prnt(HELP_MESSAGE, ev.target)
 
-    def on_privmsg(self, serv, ev):
-        logging.debug('privmsg %s: %s', ev.source.nick, ev.arguments[0])
-        if ev.arguments[0] == self.name+': help':
-            self.prnt(HELP_MESSAGE, ev.source.nick)
-
-    def _prnt(self, chan):
+    def _check_queue(self):
         try:
-            line = self.chan_queues[chan].get_nowait()
-            self.serv.privmsg(chan, line)
+            (meth, kwargs) = self.input_queue.get_nowait()
+            method = getattr(self, meth)
+            method(**kwargs)
         except Empty:
             pass
-        except:
-            logging.warning('_prnt: Uncaught exception')
-            for line in format_exc().split('\n'):
-                logging.warning(line)
-        self.reactor.scheduler.execute_every(
-            TIME_BETWEEN_MESSAGES,
-            lambda: self._prnt(chan)
+
+    def on_pubmsg(self, connection, event):
+        logging.debug(
+            'pubmsg {}/{}: {}'
+            .format(
+                event.target,
+                event.source.nick,
+                event.arguments[0]
+            )
         )
-        # irclib.ServerConnection.execute_delayed(
-        #         self.serv, TIME_BETWEEN_MESSAGES, self._prnt, (chan,))
+        if event.arguments[0] == "{}: help".format(self.name):
+            self.prnt(
+                message=HELP_MESSAGE,
+                chans=[event.target]
+            )
+
+    def on_privmsg(self, connection, event):
+        logging.debug(
+            "privmsg {}: {}",
+            event.source.nick,
+            event.arguments[0]
+        )
+        if event.arguments[0] == "{}: help".format(self.name):
+            self.prnt(
+                message=HELP_MESSAGE,
+                chans=[event.source.nick]
+            )
 
     def prnt(self, message, chans=None):
         '''
@@ -110,65 +113,13 @@ class FrontBot(SingleServerIRCBot):
         '''
         if chans is None:
             chans = self.chans
-        if type(chans) is not list:
+        if not isinstance(chans, list):
             chans = [chans]
         logging.debug('prnt on %s : %s', ', '.join(chans), message)
+        lines = message.split('\n')
         for chan in chans:
-            if chan not in self.chan_queues:
-                self.chan_queues[chan] = Queue()
-                self._prnt(chan)
-            for line in message.split('\n'):
-                self.chan_queues[chan].put(line)
-
-    def add_chan(self, chan):
-        '''
-        Adds the chan to the chan list, creates its queue and join it.
-        Prints a V.WARNING level message if chan is already in the list.
-        @param chan: The chan to add.
-        '''
-        logging.info('adding chan %s', chan)
-        if chan not in self.chans:
-            self.serv.join(chan)
-            self.chan_queues[chan] = Queue()
-            self._prnt(chan)
-        else:
-            logging.warning('chan %s already in chan list (%s)',
-                            chan, ', '.join(self.chans))
-
-    def del_chan(self, chan):
-        '''
-        Deletes the chan from the chan list, deletes its queue and part from
-        it.
-        Prints a V.WARNING level message if chan is not in the list.  @param
-        chan: The chan to delete.
-        '''
-        logging.info('deleting chan %s', chan)
-        if chan in self.chans:
-            pass
-            # PARTIR DU CANAL
-            # SUPPRIMER L'ENTRÉE DU DICTIONNAIRE
-        else:
-            logging.warning('chan %s is not in chan list (%s)',
-                            chan, ', '.join(self.chans))
-
-    def _check_queue(self, queue):
-        try:
-            meth, message = queue.get_nowait()
-            getattr(self, meth)(message)
-        except Empty:
-            pass
-        except:
-            logging.warning('_check_queue: Uncaught exception')
-            for line in format_exc().split('\n'):
-                if line:
-                    logging.warning(line)
-        self.reactor.scheduler.execute_every(
-            TIME_BETWEEN_QUEUE_CHECKS,
-            lambda: self._check_queue(queue)
-        )
-        # irclib.ServerConnection.execute_delayed(self.serv,
-        #                                         TIME_BETWEEN_QUEUE_CHECKS,
-        #                                         self._check_queue, (queue,))
+            for line in lines:
+                self.connection.privmsg(chan, line)
 
 
 class FrontBotThread(Process):
