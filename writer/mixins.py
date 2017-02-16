@@ -16,7 +16,7 @@ class RichTextMixin():
         return self._get_template().format(**self.get_context())
 
     def render_irccolors(self):
-        template = self.get_template()
+        template = self._get_template()
         context = self.get_context()
         for key, value in context.items():
             if key in CONFIG:

@@ -30,7 +30,7 @@ class Color():
 
     def __str__(self):
         return (
-            "{:c}{:d}{:c}{text}{:c}{:c}"
+            "{:c}{:d}{:c}{!s}{:c}{:c}"
             .format(3, self.color, 2, self.text, 2, 3)
         )
 
