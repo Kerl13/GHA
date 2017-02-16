@@ -27,6 +27,7 @@ from HooksHandler import HooksHandlerThread
 
 # from GitHubHooks import *
 from parsing.gitlab import parse as gitlab_parse
+from parsing.github import parse as github_parse
 
 
 class GHA(Process):
@@ -77,17 +78,17 @@ class GHA(Process):
         self.start_ircbot()
         while True:
             (headers, body) = self.hooks_queue.get()
-
+            hook = json.loads(body)
+            git_obj = None
             try:
                 if 'X-Github-Event' in headers.keys():
-                    pass
+                    git_obj = github_parse(hook)
                 else:
-                    hook = json.loads(body)
                     git_obj = gitlab_parse(hook)
-                    self.text_queue.put((
-                        "prnt",
-                        {"message": git_obj.render_irccolors()}
-                    ))
+                self.text_queue.put((
+                    "prnt",
+                    {"message": git_obj.render_irccolors()}
+                ))
 
             except:
                 if self.config.report_errors:

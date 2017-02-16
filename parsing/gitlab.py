@@ -3,13 +3,8 @@ This module performs the parsing of Gitlab's hooks and internalizes them
 using the classes described in ``models.py``.
 """
 
-import URLShortener
-from models import User, Project, Push, Tag, Commit, Issue, MergeRequest
-
-
-class UnknownKindError(Exception):
-    def __init__(self, kind):
-        super().__init__("Unknown gitlab hook kind: {:s}".format(kind))
+from models import Project, Push, Tag, Commit, Issue, MergeRequest
+from .common import ParserContext, shorten_url, UnknownKindError
 
 
 def _preterit(action):
@@ -17,34 +12,6 @@ def _preterit(action):
         return "{}ed".format(action)
     elif action in ["update", "close"]:
         return "{}d".format(action)
-
-
-class ParserContext():
-    def __init__(self, user=None, project=None):
-        self._user = user
-        self.users = dict()
-        if self._user:
-            self.users.append(self._user)
-
-    def get_or_create_user(self, name, email):
-        # We bet that every user has a different name
-        if name in self.users:
-            return self.users[name]
-        else:
-            user = User(name=name, email=email)
-            self.users[name] = user
-            return user
-
-    @property
-    def user(self):
-        return self._user
-
-    @user.setter
-    def user(self, value):
-        name, email = value
-        user = User(name=name, email=email)
-        self.users[name] = User(name=name, email=email)
-        self._user = user
 
 
 def parse(hook):
@@ -72,7 +39,7 @@ def parse(hook):
         ctxt.user = (hook["user"]["name"], None)
         return parse_merge_request(ctxt, hook)
     else:
-        raise UnknownKindError(kind)
+        raise UnknownKindError("Gitlab", kind)
 
 
 def parse_project(ctxt, hook):
@@ -88,14 +55,14 @@ def parse_push(ctxt, hook):
         Commit(
             id=commit["id"],
             message=commit["message"],
-            url=URLShortener.short(commit["url"]),
+            url=shorten_url(commit["url"]),
             author=ctxt.get_or_create_user(**commit["author"]),
         ) for commit in hook["commits"]
     ]
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
-        url=URLShortener.short(
+        url=shorten_url(
             "{}/compare/{}...{}"
             .format(hook["project"]["web_url"],
                     hook["before"],
@@ -122,7 +89,7 @@ def parse_issue(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=URLShortener.short(attrs["url"])
+        url=shorten_url(attrs["url"])
     )
 
 
@@ -132,7 +99,7 @@ def parse_merge_request(ctxt, hook):
         id=attrs["id"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
-        url=URLShortener.short(attrs["url"]),
+        url=shorten_url(attrs["url"]),
         user=ctxt.user,
         project=ctxt.project
     )
