@@ -94,6 +94,10 @@ class FrontBot(SingleServerIRCBot):
             logging.warning('_prnt: Uncaught exception')
             for line in format_exc().split('\n'):
                 logging.warning(line)
+        self.reactor.scheduler.execute_every(
+            TIME_BETWEEN_MESSAGES,
+            lambda: self._prnt(chan)
+        )
         # irclib.ServerConnection.execute_delayed(
         #         self.serv, TIME_BETWEEN_MESSAGES, self._prnt, (chan,))
 
@@ -106,6 +110,8 @@ class FrontBot(SingleServerIRCBot):
         '''
         if chans is None:
             chans = self.chans
+        if type(chans) is not list:
+            chans = [chans]
         logging.debug('prnt on %s : %s', ', '.join(chans), message)
         for chan in chans:
             if chan not in self.chan_queues:
@@ -156,6 +162,10 @@ class FrontBot(SingleServerIRCBot):
             for line in format_exc().split('\n'):
                 if line:
                     logging.warning(line)
+        self.reactor.scheduler.execute_every(
+            TIME_BETWEEN_QUEUE_CHECKS,
+            lambda: self._check_queue(queue)
+        )
         # irclib.ServerConnection.execute_delayed(self.serv,
         #                                         TIME_BETWEEN_QUEUE_CHECKS,
         #                                         self._check_queue, (queue,))
@@ -166,14 +176,14 @@ class FrontBotThread(Process):
     '''
     A little Thread class allowing you to run your FrontBot encapsulated in
     a Thread. Create a bot, give him some multiprocessing.Queues in order to
-    be able to communicate with hime. Then, create a FrontBotThread with the
+    be able to communicate with him. Then, create a FrontBotThread with the
     FrontBot as argument.
     If F is your FrontBot, you could simply do something like that:
     FrontBotThread(F).start().
     '''
 
     def __init__(self, bot):
-        Process.__init__(self)
+        super().__init__()
         self.bot = bot
 
     def run(self):
