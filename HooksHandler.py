@@ -16,33 +16,54 @@
 
 import logging
 from multiprocessing import Process
-from Bottle import Bottle, request
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
+
+# ---
+# The web server
+# ---
+
+class SimplePOSTHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        """
+        Handle git{lab,hub}'s POST requests.
+        """
+        # Fetching data
+        content_length = int(self.headers.get("Content-Length"))
+        body = self.rfile.read(content_length).decode("utf-8")
+        # Responding to server
+        self.send_response(301, message="OK")
+        self.end_headers()
+        # Feeding the hooks queue
+        self.server.hooks_queue.put((self.headers, body))
+
+
+class MyHTTPServer(HTTPServer):
+    """
+    This server class has also two queues to allow it to communicate with other
+    threads.
+    """
+    def __init__(self, server_address, handler_cls, hooks_queue):
+        self.hooks_queue = hooks_queue
+        super().__init__(server_address, handler_cls)
+
+
+# ---
+# The handler thread
+# ---
 
 class HooksHandlerThread(Process):
 
-    def __init__(self, host='localhost', port=80, queues=[]):
-        Process.__init__(self)
+    def __init__(self, queue, host='localhost', port=80):
+        super().__init__()
         self.host = host
         self.port = port
-        self.queues = queues
-        self.app = Bottle()
-        logging.info('Ignited on %s/%s', host, port)
+        self.queue = queue
+        self.app = MyHTTPServer((host, port), SimplePOSTHandler, queue)
+        logging.info('Ignited on %s:%s', host, port)
 
     def run(self):
-        @self.app.route('/', method='POST')
-        def index():
-            logging.debug('Received request')
-            headers_list = request.headers.items()
-            headers_dict = {}
-            for key, value in headers_list:
-                headers_dict[key] = value
-            body = request.body.read()
-            for queue in self.queues:
-                queue.put((headers_dict, body))
-            return ''
-
         try:
-            self.app.run(host=self.host, port=self.port, quiet=True)
+            self.app.serve_forever()
         except Exception as ex:
             logging.critical('Error while starting server: %s', str(ex))
