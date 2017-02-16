@@ -18,9 +18,8 @@ import argparse
 import logging
 import json
 from sys import argv
-from json import loads, dumps
 from os import getpid
-from queue import Queue
+from multiprocessing import Process, Queue
 from traceback import format_exc
 
 from FrontBot import FrontBot, FrontBotThread
@@ -29,165 +28,186 @@ from HooksHandler import HooksHandlerThread
 # from GitHubHooks import *
 from parsing.gitlab import parse as gitlab_parse
 
-logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
-                           'line %(lineno)s | %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
-logging.info('Starting')
+class GHA(Process):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.hooks_queue = Queue()
+        self.text_queue = Queue()
 
-DESCRIPTION = '''Github Announcer
+    def start_webserver(self):
+        hht = HooksHandlerThread(
+            self.hooks_queue,
+            self.config.listen_host,
+            self.config.listen_port
+        )
+        hht.start()
+        logging.info("HooksHandlerThread's pid: {:d}".format(hht.pid))
+        if self.config.write_pid:
+            logging.debug(
+                "Writing HooksHandlerThread's pid in `{}`."
+                .format(self.config.write_pid)
+            )
+            with open(self.config.write_pid, 'a') as file:
+                file.write("{:d}\n".format(hht.pid))
 
+    def start_ircbot(self):
+        bot = FrontBot(
+            self.config.irc_host,
+            self.config.irc_port,
+            self.config.irc_chans,
+            self.config.irc_name,
+            [self.text_queue]
+        )
+        bot_thread = FrontBotThread(bot)
+        bot_thread.start()
 
-'''
+        logging.info("FrontBotThread's pid: {:d}".format(bot_thread.pid))
+        if self.config.write_pid:
+            logging.debug(
+                "Writing FrontBotThread's pid in `{}`."
+                .format(self.config.write_pid)
+            )
+            with open(self.config.write_pid, 'a') as file:
+                file.write("{:d}\n".format(bot_thread))
 
-parser = argparse.ArgumentParser(description=DESCRIPTION, prog=argv[0])
+    def run(self):
+        self.start_webserver()
+        self.start_ircbot()
+        while True:
+            (headers, body) = self.hooks_queue.get()
 
-parser.add_argument('-lh', '--listen-host',
-                    type=str,
-                    help='the address where GHA will be listening')
+            try:
+                if 'X-Github-Event' in headers.keys():
+                    pass
+                else:
+                    hook = json.loads(body)
+                    git_obj = gitlab_parse(hook)
+                    self.text_queue.put(('prnt', git_obj.render_irccolors()))
 
-parser.add_argument('-lp', '--listen-port',
-                    type=int,
-                    help='the port where GHA will be listening')
-
-parser.add_argument('-ih', '--irc-host',
-                    type=str,
-                    help='the irc server\'s address')
-
-parser.add_argument('-ip', '--irc-port',
-                    type=int,
-                    help='the irc server\'s port')
-
-parser.add_argument('-ic', '--irc-chans',
-                    nargs='*',
-                    help='the irc channels')
-
-parser.add_argument('-in', '--irc-name',
-                    type=str,
-                    help='the bot\'s name')
-
-parser.add_argument('-ea', '--export-arguments',
-                    metavar='FILE',
-                    type=str,
-                    help='export arguments in the given file')
-
-parser.add_argument('-ia', '--import-arguments',
-                    metavar='FILE',
-                    type=str,  # à rendre plus précis
-                    help='import arguments from the given file')
-
-parser.add_argument('--write-pid',
-                    metavar='FILE',
-                    type=str,
-                    help='write all threads pids in given file')
-
-parser.add_argument('-re', '--report-errors',
-                    metavar='NICK',
-                    type=str,
-                    help='Report errors to the given person')
-
-ARGS = parser.parse_args()
-
-if ARGS.import_arguments:
-    try:
-        args = loads(open(ARGS.import_arguments).read())
-        for arg in [s for s in dir(ARGS) if s[0] != '_']:
-            if arg in args and not getattr(ARGS, arg):
-                setattr(ARGS, arg, args[arg])
-    except IOError:
-        logging.error('The file %s were not found', ARGS.import_arguments)
-        exit(1)
-    except:
-        logging.error('Error while importing arguments from file.')
-        for line in format_exc().split('\n'):
-            if line:
-                logging.error(line)
-        exit(1)
-
-if not ARGS.listen_host:
-    logging.info('No listen host given. Using 0.0.0.0.')
-    ARGS.listen_host = '0.0.0.0'
-
-if not ARGS.listen_port:
-    logging.info('No listen port given. Using 80.')
-    ARGS.listen_port = 80
-
-if not ARGS.irc_host:
-    logging.info('No IRC host given. Using localhost.')
-    ARGS.irc_host = 'localhost'
-
-if not ARGS.irc_port:
-    logging.info('No IRC port given. Using 6667.')
-    ARGS.irc_port = 6667
-
-if not ARGS.irc_chans:
-    logging.info('No IRC chans given.')
-    ARGS.irc_chans = []
-
-if not ARGS.irc_name:
-    logging.info('No IRC name given. Using GHA.')
-    ARGS.irc_name = 'GHA'
-
-logging.info('Main thread\'s pid: %d' % (getpid(),))
-if ARGS.write_pid:
-    open(ARGS.write_pid, 'w').close()  # Shrink size to 0
-    logging.debug('Writing main thread\'s pid in `%s`.' % ARGS.write_pid)
-    open(ARGS.write_pid, 'a').write(str(getpid()) + '\n')
+            except:
+                if self.config.report_errors:
+                    for line in format_exc().split('\n'):
+                        if line:
+                            self.text_queue.put(
+                                ('prnt', (line, [self.config.report_errors]))
+                            )
 
 
-if ARGS.export_arguments:
-    args = {}
-    for arg in [
-            s for s in dir(ARGS) if s[0] != '_'
-            and s not in ['import_arguments', 'export_arguments']
-            ]:
-        args[arg] = getattr(ARGS, arg)
-    open(ARGS.export_arguments, 'w+').write(dumps(args, indent=4))
-    exit(0)
+if __name__ == "__main__":
+    DESCRIPTION = """Github Announcer"""
 
+    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
+                               'line %(lineno)s | %(message)s',
+                        datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
 
-hooks_queue = Queue()
-text_queue = Queue()
+    parser = argparse.ArgumentParser(description=DESCRIPTION, prog=argv[0])
 
-HHT = HooksHandlerThread(ARGS.listen_host, ARGS.listen_port, [hooks_queue])
-HHT.start()
+    parser.add_argument('-lh', '--listen-host',
+                        type=str,
+                        help='the address where GHA will be listening')
 
-logging.info('HooksHandlerThread\'s pid: %d' % HHT.pid)
-if ARGS.write_pid:
-    logging.debug('Writing HooksHandlerThread\'s pid in `%s`.'
-                  % ARGS.write_pid)
-    open(ARGS.write_pid, 'a').write("%d\n" % HHT.pid)
+    parser.add_argument('-lp', '--listen-port',
+                        type=int,
+                        help='the port where GHA will be listening')
 
-FB = FrontBot(ARGS.irc_host, ARGS.irc_port, ARGS.irc_chans, ARGS.irc_name,
-              [text_queue])
-FBT = FrontBotThread(FB)
-FBT.start()
+    parser.add_argument('-ih', '--irc-host',
+                        type=str,
+                        help='the irc server\'s address')
 
-logging.info('FrontBotThread\'s pid: %d' % FBT.pid)
-if ARGS.write_pid:
-    logging.debug('Writing FrontBotThread\'s pid in `%s`.' % ARGS.write_pid)
-    open(ARGS.write_pid, 'a').write(str(FBT.pid) + '\n')
+    parser.add_argument('-ip', '--irc-port',
+                        type=int,
+                        help='the irc server\'s port')
 
+    parser.add_argument('-ic', '--irc-chans',
+                        nargs='*',
+                        help='the irc channels')
 
-def irc_prnt(message):
-    text_queue.put(('prnt', (message, None)))
+    parser.add_argument('-in', '--irc-name',
+                        type=str,
+                        help='the bot\'s name')
 
+    parser.add_argument('-ea', '--export-arguments',
+                        metavar='FILE',
+                        type=str,
+                        help='export arguments in the given file')
 
-while True:
-    (headers, body) = hooks_queue.get()
+    parser.add_argument('-ia', '--import-arguments',
+                        metavar='FILE',
+                        type=str,  # à rendre plus précis
+                        help='import arguments from the given file')
 
-    try:
-        if 'X-Github-Event' in headers.keys():
-            # text_queue.put(('prnt', (GitHubHooks.handle(headers, body),)))
-            pass
+    parser.add_argument('--write-pid',
+                        metavar='FILE',
+                        type=str,
+                        help='write all threads pids in given file')
 
-        else:
-            hook = json.loads(body)
-            git_obj = gitlab_parse(hook)
-            text_queue.put(('prnt', git_obj.render_irccolors()))
+    parser.add_argument('-re', '--report-errors',
+                        metavar='NICK',
+                        type=str,
+                        help='Report errors to the given person')
 
-    except:
-        if ARGS.report_errors:
+    config = parser.parse_args()
+
+    if config.import_arguments:
+        try:
+            file_config = None
+            with open(config.import_arguments, "r") as file:
+                file_config = json.load(file)
+            for arg in [s for s in dir(config) if s[0] != '_']:
+                if arg in file_config and not getattr(config, arg):
+                    setattr(config, arg, file_config[arg])
+        except IOError:
+            logging.error('File %s not found', config.import_arguments)
+            exit(1)
+        except:
+            logging.error('Error while importing arguments from file.')
             for line in format_exc().split('\n'):
                 if line:
-                    text_queue.put(('prnt', (line, [ARGS.report_errors])))
+                    logging.error(line)
+            exit(1)
+
+    if not config.listen_host:
+        logging.info('No listen host given. Using 0.0.0.0.')
+        config.listen_host = '0.0.0.0'
+
+    if not config.listen_port:
+        logging.info('No listen port given. Using 80.')
+        config.listen_port = 80
+
+    if not config.irc_host:
+        logging.info('No IRC host given. Using localhost.')
+        config.irc_host = 'localhost'
+
+    if not config.irc_port:
+        logging.info('No IRC port given. Using 6667.')
+        config.irc_port = 6667
+
+    if not config.irc_chans:
+        logging.info('No IRC chans given.')
+        config.irc_chans = []
+
+    if not config.irc_name:
+        logging.info('No IRC name given. Using GHA.')
+        config.irc_name = 'GHA'
+
+    logging.info('Main thread\'s pid: %d' % (getpid(),))
+    if config.write_pid:
+        open(config.write_pid, 'w').close()  # Shrink size to 0
+        logging.debug('Writing main thread\'s pid in `%s`.' % config.write_pid)
+        open(config.write_pid, 'a').write(str(getpid()) + '\n')
+
+    if config.export_arguments:
+        args = {}
+        for arg in [
+                s for s in dir(config) if s[0] != '_'
+                and s not in ['import_arguments', 'export_arguments']
+                ]:
+            args[arg] = getattr(config, arg)
+        open(config.export_arguments, 'w+').write(json.dumps(args, indent=4))
+        exit(0)
+
+    gha = GHA(config)
+    gha.start()
+    gha.join()
