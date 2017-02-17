@@ -12,7 +12,9 @@
 ###############################################################################
 
 from .common import ParserContext, UnknownKindError
-from models import Project, Commit, Push, Issue, MergeRequest
+from models import (
+    Project, Commit, Push, Issue, MergeRequest, WikiPage, Wiki
+)
 
 
 def parse(header, hook):
@@ -33,6 +35,9 @@ def parse(header, hook):
     elif kind == "pull_request":
         ctxt.user = (hook["pull_request"]["user"]["login"], None)
         return parse_merge_request(ctxt, hook)
+    elif kind == "gollum":
+        ctxt.user = (hook["sender"]["login"], None)
+        return parse_wiki(ctxt, hook)
     else:
         raise UnknownKindError("Github", kind)
 
@@ -86,4 +91,21 @@ def parse_merge_request(ctxt, hook):
         title=mr["title"],
         action=hook["action"],
         url=mr["html_url"],
+    )
+
+
+def parse_wiki(ctxt, hook):
+    pages = [
+        WikiPage(
+            name=page["page_name"],
+            title=page["title"],
+            action=page["action"],
+            url=page["html_url"]
+        )
+        for page in hook["pages"]
+    ]
+    return Wiki(
+        user=ctxt.user,
+        project=ctxt.project,
+        pages=pages
     )

@@ -3,14 +3,16 @@ This module performs the parsing of Gitlab's hooks and internalizes them
 using the classes described in ``models.py``.
 """
 
-from models import Project, Push, Tag, Commit, Issue, MergeRequest
+from models import (
+    Project, Push, Tag, Commit, Issue, MergeRequest, WikiPage, Wiki
+)
 from .common import ParserContext, UnknownKindError
 
 
 def _preterit(action):
     if action in ["open"]:
         return "{}ed".format(action)
-    elif action in ["update", "close"]:
+    elif action in ["update", "close", "create"]:
         return "{}d".format(action)
 
 
@@ -38,6 +40,10 @@ def parse(hook):
         parse_project(ctxt, hook["object_attributes"]["target"])
         ctxt.user = (hook["user"]["name"], None)
         return parse_merge_request(ctxt, hook)
+    elif kind == "wiki_page":
+        parse_project(ctxt, hook["project"])
+        ctxt.user = (hook["user"]["name"], None)
+        return parse_wiki(ctxt, hook)
     else:
         raise UnknownKindError("Gitlab", kind)
 
@@ -102,4 +108,19 @@ def parse_merge_request(ctxt, hook):
         url=attrs["url"],
         user=ctxt.user,
         project=ctxt.project
+    )
+
+
+def parse_wiki(ctxt, hook):
+    page = hook["object_attributes"]
+    page = WikiPage(
+        name=page["slug"],
+        title=page["title"],
+        action=_preterit(page["action"]),
+        url=page["url"]
+    )
+    return Wiki(
+        user=ctxt.user,
+        project=ctxt.project,
+        pages=[page]
     )

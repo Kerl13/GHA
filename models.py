@@ -114,3 +114,25 @@ class MergeRequest(Event, RichTextMixin):
         self.title = title
         self.action = action
         self.url = url
+
+
+# ---
+# Wiki related models
+# ---
+
+class WikiPage(RichTextMixin):
+    TEMPLATE = "{action} page {page_name}: {title}. ({url})"
+
+    def __init__(self, name, title, action, url):
+        self.page_name = name
+        self.title = title
+        self.action = action
+        self.url = url
+
+
+class Wiki(Event, RichTextMixin):
+    TEMPLATE = "[{project}] {user} updated the wiki\n{wiki_pages}"
+
+    def __init__(self, pages, **kwargs):
+        Event.__init__(self, **kwargs)
+        self.wiki_pages = RichTextList(pages)
