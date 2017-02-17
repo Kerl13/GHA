@@ -96,9 +96,10 @@ class GHA(Process):
                 if self.config.report_errors:
                     for line in format_exc().split('\n'):
                         if line:
-                            self.text_queue.put(
-                                ('prnt', (line, [self.config.report_errors]))
-                            )
+                            self.text_queue.put((
+                                "prnt",
+                                {"message": line}
+                            ))
 
 
 if __name__ == "__main__":
