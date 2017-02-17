@@ -17,7 +17,7 @@ This module describes the internal representations of Gitlab's hooks.
 """
 
 
-from writer.common import RichTextMixin
+from writer.common import RichTextMixin, RichTextList
 
 
 # ---
@@ -43,7 +43,9 @@ class Project():
         return self.name
 
 
-class Commit():
+class Commit(RichTextMixin):
+    TEMPLATE = "{id} {author}: {message}"
+
     def __init__(self, id, message, url, author):
         self.id = id
         self.message = message
@@ -64,19 +66,23 @@ class Event():
 
 class Push(Event, RichTextMixin):
     TEMPLATE = (
-        "[{project}] {user} pushed {nb} commits to {branch}. ({url})"
+        "[{project}] {user} pushed {nb} commits to {branch}. ({url})\n"
+        "{commits}"
     )
 
     def __init__(self, branch, commits, url, **kwargs):
         Event.__init__(self, **kwargs)
         self.branch = branch
-        self.commits = commits
+        self.commits = RichTextList(commits)
         self.url = url
 
     def get_context(self):
         context = RichTextMixin.get_context(self)
         context["nb"] = len(self.commits)
         return context
+
+    def render_after(self):
+        return self.commits
 
 
 class Tag(Event, RichTextMixin):
