@@ -1,11 +1,25 @@
+"""
+Parsing tools
+"""
+
 from models import User
 
 
 class UnknownKindWarning(Warning):
+    """
+    Warning raised when the parser cannot identify the event described by the
+    hook.
+    """
     pass
 
 
 class ParserContext():
+    """
+    This class stores
+    - The list of known users
+    - The user at the origin of the event
+    - The project involved
+    """
     def __init__(self, user=None, project=None):
         self._user = user
         self.users = dict()

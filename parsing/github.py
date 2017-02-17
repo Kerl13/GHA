@@ -11,6 +11,14 @@
 #                                                                             #
 ###############################################################################
 
+"""
+This module performs the parsing of GitHub's hooks and internalizes them
+using the classes described in ``models.py``.
+
+The only function you should use is ``parse``, the others are called by
+``parse`` depending on the entries.
+"""
+
 import warnings
 from .common import ParserContext, UnknownKindWarning
 from models import Project, Commit, Push, Issue, MergeRequest

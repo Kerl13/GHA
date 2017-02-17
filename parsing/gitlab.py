@@ -1,6 +1,9 @@
 """
-This module performs the parsing of Gitlab's hooks and internalizes them
+This module performs the parsing of GitLab's hooks and internalizes them
 using the classes described in ``models.py``.
+
+The only function you should use is ``parse``, the others are called by
+``parse`` depending on the entries.
 """
 
 import warnings
