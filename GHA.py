@@ -81,16 +81,17 @@ class GHA(Process):
         while True:
             (headers, body) = self.hooks_queue.get()
             hook = json.loads(body)
-            git_obj = None
             try:
-                if 'X-Github-Event' in headers.keys():
-                    git_obj = github_parse(hook)
+                git_obj = None
+                if 'X-GitHub-Event' in headers.keys():
+                    git_obj = github_parse(headers, hook)
                 else:
                     git_obj = gitlab_parse(hook)
-                self.text_queue.put((
-                    "prnt",
-                    {"message": git_obj.render_irccolors()}
-                ))
+                if git_obj is not None:
+                    self.text_queue.put((
+                        "prnt",
+                        {"message": git_obj.render_irccolors()}
+                    ))
 
             except:
                 if self.config.report_errors:
