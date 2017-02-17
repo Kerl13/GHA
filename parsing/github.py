@@ -11,7 +11,8 @@
 #                                                                             #
 ###############################################################################
 
-from .common import ParserContext, UnknownKindError
+import warnings
+from .common import ParserContext, UnknownKindWarning
 from models import Project, Commit, Push, Issue, MergeRequest
 
 
@@ -34,7 +35,10 @@ def parse(header, hook):
         ctxt.user = (hook["pull_request"]["user"]["login"], None)
         return parse_merge_request(ctxt, hook)
     else:
-        raise UnknownKindError("Github", kind)
+        warnings.warn(
+            "Unknown GitHub event: {}".format(kind),
+            UnknownKindWarning
+        )
 
 
 def parse_project(ctxt, hook):

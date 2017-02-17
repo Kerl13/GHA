@@ -3,8 +3,9 @@ This module performs the parsing of Gitlab's hooks and internalizes them
 using the classes described in ``models.py``.
 """
 
+import warnings
 from models import Project, Push, Tag, Commit, Issue, MergeRequest
-from .common import ParserContext, UnknownKindError
+from .common import ParserContext, UnknownKindWarning
 
 
 def _preterit(action):
@@ -39,7 +40,10 @@ def parse(hook):
         ctxt.user = (hook["user"]["name"], None)
         return parse_merge_request(ctxt, hook)
     else:
-        raise UnknownKindError("Gitlab", kind)
+        warnings.warn(
+            "Unknown GitLab event: {}".format(kind),
+            UnknownKindWarning
+        )
 
 
 def parse_project(ctxt, hook):

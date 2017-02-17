@@ -1,12 +1,8 @@
 from models import User
 
 
-class UnknownKindError(Exception):
-    def __init__(self, source, kind):
-        super().__init__(
-            "Unknown {:s} hook kind: {:s}"
-            .format(source, kind)
-        )
+class UnknownKindWarning(Warning):
+    pass
 
 
 class ParserContext():
