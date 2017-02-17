@@ -81,9 +81,6 @@ class Push(Event, RichTextMixin):
         context["nb"] = len(self.commits)
         return context
 
-    def render_after(self):
-        return self.commits
-
 
 class Tag(Event, RichTextMixin):
     TEMPLATE = "[{project}] {user} added the tag {tag_name}"

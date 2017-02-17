@@ -49,9 +49,6 @@ class RichTextMixin():
     def get_context(self):
         return self.__dict__
 
-    def render_after(self):
-        return []
-
 
 class RichTextList():
     def __init__(self, lines):
