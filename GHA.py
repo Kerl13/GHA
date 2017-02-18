@@ -107,14 +107,6 @@ class GHA(Process):
 
 if __name__ == "__main__":
     # ---
-    # Setting up the logger configuration
-    # ---
-
-    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
-                               'line %(lineno)s | %(message)s',
-                        datefmt='%m/%d/%Y %H:%M:%S', level=logging.WARN)
-
-    # ---
     # Parsing command line arguments
     # ---
 
@@ -173,14 +165,22 @@ if __name__ == "__main__":
 
     config = parser.parse_args()
 
-    # Setting the verbosity level of the logger
+    # ---
+    # Setting up the logger configuration
+    # ---
+
+    log_level = logging.WARN
     if 0 <= config.verbosity <= 3:
         levels = [logging.CRITICAL, logging.WARN, logging.INFO, logging.DEBUG]
-        logging.getLogger(__name__).setLevel(levels[config.verbosity])
+        log_levels = levels[config.verbosity]
     else:
         logging.error("Invalid verbosity level: {:d}.\nMaximum verbosity: 3"
                       .format(config.verbosity))
         exit(1)
+
+    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
+                               'line %(lineno)s | %(message)s',
+                        datefmt='%m/%d/%Y %H:%M:%S', level=log_levels)
 
     if config.import_arguments:
         try:
