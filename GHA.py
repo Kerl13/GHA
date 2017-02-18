@@ -98,7 +98,10 @@ class GHA(Process):
                         if line:
                             self.text_queue.put((
                                 "prnt",
-                                {"message": line}
+                                {
+                                    "message": line,
+                                    "chans": [self.config.report_errors]
+                                }
                             ))
 
 
