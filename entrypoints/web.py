@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 ###############################################################################
 #                                                                             #
 #                                HooksHandler.py                              #
@@ -32,7 +29,7 @@ class SimplePOSTHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers.get("Content-Length"))
         body = self.rfile.read(content_length).decode("utf-8")
         # Responding to server
-        self.send_response(301, message="OK")
+        self.send_response(200, message="OK")
         self.end_headers()
         # Feeding the hooks queue
         self.server.hooks_queue.put((self.headers, body))

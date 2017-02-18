@@ -11,7 +11,16 @@
 #                                                                             #
 ###############################################################################
 
-from .common import ParserContext, UnknownKindError
+"""
+This module performs the parsing of GitHub's hooks and internalizes them
+using the classes described in ``models.py``.
+
+The only function you should use is ``parse``, the others are called by
+``parse`` depending on the entries.
+"""
+
+import warnings
+from .common import ParserContext, UnknownKindWarning
 from models import Project, Commit, Push, Issue, MergeRequest
 
 
@@ -34,7 +43,10 @@ def parse(header, hook):
         ctxt.user = (hook["pull_request"]["user"]["login"], None)
         return parse_merge_request(ctxt, hook)
     else:
-        raise UnknownKindError("Github", kind)
+        warnings.warn(
+            "Unknown GitHub event: {}".format(kind),
+            UnknownKindWarning
+        )
 
 
 def parse_project(ctxt, hook):

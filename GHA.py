@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 ###############################################################################
 #                                                                             #
@@ -81,32 +80,37 @@ class GHA(Process):
         while True:
             (headers, body) = self.hooks_queue.get()
             hook = json.loads(body)
-            git_obj = None
             try:
-                if 'X-Github-Event' in headers.keys():
-                    git_obj = github_parse(hook)
+                git_obj = None
+                if 'X-GitHub-Event' in headers.keys():
+                    git_obj = github_parse(headers, hook)
                 else:
                     git_obj = gitlab_parse(hook)
-                self.text_queue.put((
-                    "prnt",
-                    {"message": git_obj.render_irccolors()}
-                ))
+                if git_obj is not None:
+                    self.text_queue.put((
+                        "prnt",
+                        {"message": git_obj.render_irccolors()}
+                    ))
 
             except:
                 if self.config.report_errors:
                     for line in format_exc().split('\n'):
                         if line:
-                            self.text_queue.put(
-                                ('prnt', (line, [self.config.report_errors]))
-                            )
+                            self.text_queue.put((
+                                "prnt",
+                                {
+                                    "message": line,
+                                    "chans": [self.config.report_errors]
+                                }
+                            ))
 
 
 if __name__ == "__main__":
-    DESCRIPTION = """Github Announcer"""
+    # ---
+    # Parsing command line arguments
+    # ---
 
-    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
-                               'line %(lineno)s | %(message)s',
-                        datefmt='%m/%d/%Y %H:%M:%S', level=logging.DEBUG)
+    DESCRIPTION = """Github Announcer"""
 
     parser = argparse.ArgumentParser(description=DESCRIPTION, prog=argv[0])
 
@@ -120,11 +124,11 @@ if __name__ == "__main__":
 
     parser.add_argument('-ih', '--irc-host',
                         type=str,
-                        help='the irc server\'s address')
+                        help="the irc server\'s address")
 
     parser.add_argument('-ip', '--irc-port',
                         type=int,
-                        help='the irc server\'s port')
+                        help="the irc server's port")
 
     parser.add_argument('-ic', '--irc-chans',
                         nargs='*',
@@ -132,7 +136,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-in', '--irc-name',
                         type=str,
-                        help='the bot\'s name')
+                        help="the bot's name")
 
     parser.add_argument('-ea', '--export-arguments',
                         metavar='FILE',
@@ -154,17 +158,45 @@ if __name__ == "__main__":
                         type=str,
                         help='Report errors to the given person')
 
+    parser.add_argument("-v", "--verbosity",
+                        type=int,
+                        default=1,
+                        help="verbosity level")
+
     config = parser.parse_args()
+
+    # ---
+    # Setting up the logger configuration
+    # ---
+
+    log_level = logging.WARN
+    if 0 <= config.verbosity <= 3:
+        levels = [logging.CRITICAL, logging.WARN, logging.INFO, logging.DEBUG]
+        log_levels = levels[config.verbosity]
+    else:
+        logging.error("Invalid verbosity level: {:d}.\nMaximum verbosity: 3"
+                      .format(config.verbosity))
+        exit(1)
+
+    logging.basicConfig(format='%(asctime)s | %(levelname)s | %(filename)s '
+                               'line %(lineno)s | %(message)s',
+                        datefmt='%m/%d/%Y %H:%M:%S', level=log_levels)
 
     if config.import_arguments:
         try:
             file_config = None
             with open(config.import_arguments, "r") as file:
                 file_config = json.load(file)
-            for arg in [s for s in dir(config) if s[0] != '_']:
-                if arg in file_config and not getattr(config, arg):
+            # The command line arguments have the priority:
+            # If an argument is specified both in the command line and in a
+            # config file, we pick the command line's one
+            for arg in file_config:
+                if hasattr(config, arg):
+                    if not getattr(config, arg):
+                        setattr(config, arg, file_config[arg])
+                else:
                     setattr(config, arg, file_config[arg])
-        except IOError:
+        except FileNotFoundError:
             logging.error('File %s not found', config.import_arguments)
             exit(1)
         except:
@@ -198,20 +230,24 @@ if __name__ == "__main__":
         logging.info('No IRC name given. Using GHA.')
         config.irc_name = 'GHA'
 
-    logging.info('Main thread\'s pid: %d' % (getpid(),))
+    logging.info("Main thread's pid: {:d}".format(getpid()))
     if config.write_pid:
         open(config.write_pid, 'w').close()  # Shrink size to 0
-        logging.debug('Writing main thread\'s pid in `%s`.' % config.write_pid)
-        open(config.write_pid, 'a').write(str(getpid()) + '\n')
+        logging.debug(
+            "Writing main thread's pid in `{:s}`."
+            .format(config.write_pid)
+        )
+        with open(config.write_pid, 'a') as file:
+            file.write("{:d\n".format(getpid()))
 
     if config.export_arguments:
-        args = {}
-        for arg in [
-                s for s in dir(config) if s[0] != '_'
-                and s not in ['import_arguments', 'export_arguments']
-                ]:
-            args[arg] = getattr(config, arg)
-        open(config.export_arguments, 'w+').write(json.dumps(args, indent=4))
+        args = {
+            arg: value
+            for arg, value in vars(config).items()
+            if arg not in ['import_arguments', 'export_arguments']
+        }
+        with open(config.export_arguments, 'w+') as file:
+            json.dump(args, file, indent=4)
         exit(0)
 
     gha = GHA(config)

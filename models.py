@@ -45,6 +45,7 @@ class Project():
 
 class Commit():
     def __init__(self, id, message, url, author):
+        assert isinstance(author, User)
         self.id = id
         self.message = message
         self.url = url
@@ -53,6 +54,8 @@ class Commit():
 
 class Event():
     def __init__(self, user, project):
+        assert isinstance(user, User)
+        assert isinstance(project, Project)
         self.user = user
         self.project = project
 
@@ -68,6 +71,8 @@ class Push(Event, RichTextMixin):
     )
 
     def __init__(self, branch, commits, url, **kwargs):
+        assert isinstance(commits, list)
+        assert all(isinstance(commit, Commit) for commit in commits)
         Event.__init__(self, **kwargs)
         self.branch = branch
         self.commits = commits
