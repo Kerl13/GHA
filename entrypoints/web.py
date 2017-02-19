@@ -12,8 +12,12 @@
 ###############################################################################
 
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# This one is the class Queue whereas multiprocessing.Queue is just a function…
+# Yeah this python developers have a great sense of humour
+from multiprocessing.queues import Queue
 
 
 # ---

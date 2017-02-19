@@ -13,8 +13,12 @@
 
 from irc.bot import SingleServerIRCBot
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from queue import Empty
+
+# This one is the class Queue whereas multiprocessing.Queue is just a function…
+# Yeah this python developers have a great sense of humour
+from multiprocessing.queues import Queue
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
 I provide a PrinterBot.prnt method allowing some other python scripts
