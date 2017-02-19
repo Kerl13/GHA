@@ -52,8 +52,6 @@ class RichTextMixin():
                 # XXX: should be optional
                 if key == "url":
                     context[key] = C(shorten_url(value), CONFIG[key])
-                elif isinstance(value, RichTextList):
-                    context[key] = value.render_irccolors()
                 else:
                     pass
             else:
@@ -61,6 +59,8 @@ class RichTextMixin():
                     "No config option for keyword \{{key}\}",
                     RuntimeWarning
                 )
+            if isinstance(value, RichTextList):
+                context[key] = value.render_irccolors()
         return template.format(**context)
 
     def _get_template(self):
