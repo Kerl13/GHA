@@ -4,7 +4,7 @@ import json
 
 from parsing.gitlab import parse as gitlab_parse
 from parsing.github import parse as github_parse
-from models import Push, Tag, Issue, MergeRequest
+from models import Push, Tag, Issue, MergeRequest, WikiPage, Wiki
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -27,6 +27,7 @@ class TestGitlabParsing(TestParsing):
         ("tag", "gitlab/tag.json"),
         ("issue", "gitlab/issue.json"),
         ("merge_request", "gitlab/merge_request.json"),
+        ("wiki", "gitlab/wiki.json"),
     ]
 
     def test_push(self):
@@ -65,12 +66,27 @@ class TestGitlabParsing(TestParsing):
             "http://example.com/diaspora/merge_requests/1"
         )
 
+    def test_wiki(self):
+        git_obj = gitlab_parse(self.wiki)
+        self.assertIsInstance(git_obj, Wiki)
+        self.assertEqual(len(git_obj.wiki_pages), 1)
+        page = git_obj.wiki_pages[0]
+        self.assertIsInstance(page, WikiPage)
+        self.assertEqual(page.page_name, "awesome")
+        self.assertEqual(page.title, "Awesome")
+        self.assertEqual(page.action, "created")
+        self.assertEqual(
+            page.url,
+            "http://example.com/root/awesome-project/wikis/awesome"
+        )
+
 
 class TestGithubParsing(TestParsing):
     INPUTS = [
         ("push", "github/push.json"),
         ("issue", "github/issue.json"),
         ("merge_request", "github/merge_request.json"),
+        ("wiki", "github/wiki.json"),
     ]
 
     def test_push(self):
@@ -78,6 +94,7 @@ class TestGithubParsing(TestParsing):
             {"X-GitHub-Event": "push"},
             self.push
         )
+        self.assertIsInstance(git_obj, Push)
         self.assertEqual(git_obj.branch, "changes")
         self.assertEqual(
             git_obj.url,
@@ -91,6 +108,7 @@ class TestGithubParsing(TestParsing):
             {"X-GitHub-Event": "issues"},
             self.issue
         )
+        self.assertIsInstance(git_obj, Issue)
         self.assertEqual(git_obj.id, 73464126)
         self.assertEqual(git_obj.title, "Spelling error in the README file")
         self.assertEqual(git_obj.action, "opened")
@@ -104,6 +122,7 @@ class TestGithubParsing(TestParsing):
             {"X-GitHub-Event": "pull_request"},
             self.merge_request
         )
+        self.assertIsInstance(git_obj, MergeRequest)
         self.assertEqual(git_obj.id, 34778301)
         self.assertEqual(
             git_obj.title,
@@ -114,3 +133,16 @@ class TestGithubParsing(TestParsing):
             git_obj.url,
             "https://github.com/baxterthehacker/public-repo/pull/1"
         )
+
+    def test_wiki(self):
+        git_obj = github_parse(
+            {"X-GitHub-Event": "gollum"},
+            self.wiki
+        )
+        self.assertIsInstance(git_obj, Wiki)
+        self.assertEqual(len(git_obj.wiki_pages), 1)
+        page = git_obj.wiki_pages[0]
+        self.assertIsInstance(page, WikiPage)
+        self.assertEqual(page.title, "Home")
+        self.assertEqual(page.page_name, "Home")
+        self.assertEqual(page.action, "created")

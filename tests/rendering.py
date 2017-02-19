@@ -4,7 +4,9 @@ TODO
 
 import unittest
 
-from models import Project, User, Push, Commit, Tag, Issue, MergeRequest
+from models import (
+    Project, User, Push, Commit, Tag, Issue, MergeRequest, WikiPage, Wiki
+)
 
 
 class TestSimpleRendering(unittest.TestCase):
@@ -67,4 +69,25 @@ class TestSimpleRendering(unittest.TestCase):
             mr.render_simple(),
             "[My Project] Mrs Foobar updated merge request !5: Use utf-8. "
             "(http://example.com/project/mr/5)"
+        )
+
+    def test_wiki(self):
+        pages = [
+            WikiPage(
+                name="home",
+                title="Home page of my project's wiki",
+                action="created",
+                url="example.com/wiki/home"
+            )
+        ]
+        wiki = Wiki(
+            user=self.user,
+            project=self.project,
+            pages=pages
+        )
+        self.assertEqual(
+            wiki.render_simple(),
+            "[My Project] Mrs Foobar updated the wiki\n"
+            "created page home: Home page of my project's wiki. "
+            "(example.com/wiki/home)"
         )

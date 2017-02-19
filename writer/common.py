@@ -86,6 +86,21 @@ class RichTextList():
             assert isinstance(lines[0], RichTextMixin)
         self.lines = lines
 
+    # ---
+    # These methods reproduce the behaviour of a list
+    # ---
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __getitem__(self, key):
+        return self.lines[key]
+
+    # ---
+    # These methods define how the list should be displayed.
+    # This is the "RichText" part of the class.
+    # ---
+
     def render_simple(self):
         return "\n".join([
             line.render_simple() for line in self.lines
@@ -95,9 +110,6 @@ class RichTextList():
         return "\n".join([
             line.render_irccolors() for line in self.lines
         ])
-
-    def __len__(self):
-        return len(self.lines)
 
 
 def shorten_url(url):
