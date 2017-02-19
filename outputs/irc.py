@@ -13,7 +13,7 @@
 
 from irc.bot import SingleServerIRCBot
 import logging
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from queue import Empty
 
 HELP_MESSAGE = '''I am a PrinterBot writen in Python with IRCBot.
@@ -51,6 +51,7 @@ class FrontBot(SingleServerIRCBot):
 
     def __init__(self, input_queue, server='localhost', port=6667, chans=[],
                  name='FrontBot'):
+        assert isinstance(input_queue, Queue)
         super().__init__([(server, port)], name, name, 10)
         self.chans = chans
         self.name = name
@@ -131,6 +132,7 @@ class FrontBotThread(Process):
     '''
 
     def __init__(self, bot):
+        assert isinstance(bot, FrontBot)
         super().__init__()
         self.bot = bot
 

@@ -12,7 +12,7 @@
 ###############################################################################
 
 import logging
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
@@ -41,6 +41,7 @@ class MyHTTPServer(HTTPServer):
     threads.
     """
     def __init__(self, server_address, handler_cls, hooks_queue):
+        assert isinstance(hooks_queue, Queue)
         self.hooks_queue = hooks_queue
         super().__init__(server_address, handler_cls)
 
@@ -52,6 +53,7 @@ class MyHTTPServer(HTTPServer):
 class HooksHandlerThread(Process):
 
     def __init__(self, queue, host='localhost', port=80):
+        assert isinstance(queue, Queue)
         super().__init__()
         self.host = host
         self.port = port
