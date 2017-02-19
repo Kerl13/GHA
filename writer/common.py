@@ -32,10 +32,12 @@ class RichTextMixin():
     TEMPLATE = ""
 
     def render_simple(self):
-        """
-        Plain text rendering
-        """
-        return self._get_template().format(**self.get_context())
+        template = self._get_template()
+        context = self.get_context()
+        for key, value in context.items():
+            if isinstance(value, RichTextList):
+                context[key] = value.render_simple()
+        return template.format(**context)
 
     def render_irccolors(self):
         """
@@ -49,8 +51,11 @@ class RichTextMixin():
             if key in CONFIG:
                 # XXX: should be optional
                 if key == "url":
-                    value = shorten_url(value)
-                context[key] = C(value, CONFIG[key])
+                    context[key] = C(shorten_url(value), CONFIG[key])
+                elif isinstance(value, RichTextList):
+                    context[key] = value.render_irccolors()
+                else:
+                    pass
             else:
                 warnings.warn(
                     "No config option for keyword \{{key}\}",
@@ -72,6 +77,27 @@ class RichTextMixin():
         You have to override it in order to alter the rendering context.
         """
         return self.__dict__
+
+
+class RichTextList():
+    def __init__(self, lines):
+        assert isinstance(lines, list)
+        if lines:
+            assert isinstance(lines[0], RichTextMixin)
+        self.lines = lines
+
+    def render_simple(self):
+        return "\n".join([
+            line.render_simple() for line in self.lines
+        ])
+
+    def render_irccolors(self):
+        return "\n".join([
+            line.render_irccolors() for line in self.lines
+        ])
+
+    def __len__(self):
+        return len(self.lines)
 
 
 def shorten_url(url):

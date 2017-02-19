@@ -28,7 +28,8 @@ class TestSimpleRendering(unittest.TestCase):
         self.assertEqual(
             push.render_simple(),
             "[My Project] Mrs Foobar pushed 1 commits to hotfix/Issue214. "
-            "(too long don't write)"
+            "(too long don't write)\n"
+            "531 Mrs Foobar: Fix py2 compat"
         )
 
     def test_tag(self):
