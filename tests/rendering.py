@@ -16,7 +16,7 @@ class TestSimpleRendering(unittest.TestCase):
         self.user = User(name="Mrs Foobar", email="dev@foobar.net")
 
     def test_push(self):
-        commits = [Commit(id=531,
+        commits = [Commit(id="1d8d58ec4c8865394cd5ff91ce8e54b1d598346f",
                           message="Fix py2 compat",
                           url="http://example.com/project/commit/...",
                           author=self.user)]
@@ -31,7 +31,7 @@ class TestSimpleRendering(unittest.TestCase):
             push.render_simple(),
             "[My Project] Mrs Foobar pushed 1 commits to hotfix/Issue214. "
             "(too long don't write)\n"
-            "531 Mrs Foobar: Fix py2 compat"
+            "1d8d58e Mrs Foobar: Fix py2 compat"
         )
 
     def test_tag(self):

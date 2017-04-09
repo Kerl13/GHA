@@ -53,6 +53,12 @@ class Commit(RichTextMixin):
         self.url = url
         self.author = author
 
+    def get_context(self):
+        context = RichTextMixin.get_context(self)
+        print(type(context["id"]))
+        context["id"] = context["id"][:7]
+        return context
+
 
 class Event():
     def __init__(self, user, project):
