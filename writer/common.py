@@ -53,7 +53,7 @@ class RichTextMixin():
                 if key == "url":
                     context[key] = C(shorten_url(value), CONFIG[key])
                 else:
-                    pass
+                    context[key] = C(value, CONFIG[key])
             else:
                 warnings.warn(
                     "No config option for keyword \{{key}\}",
