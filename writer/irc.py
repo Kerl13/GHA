@@ -36,7 +36,7 @@ class Color():
 
 
 CONFIG = {
-    "id": Color.GRAY,
+    "id": Color.LIGHT_GRAY,
     "user": Color.CYAN,
     "author": Color.CYAN,
     "project": Color.PINK,
