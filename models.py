@@ -55,8 +55,8 @@ class Commit(RichTextMixin):
 
     def get_context(self):
         context = RichTextMixin.get_context(self)
-        print(type(context["id"]))
         context["id"] = context["id"][:7]
+        context["message"] = context["message"].split('\n')[0]
         return context
 
 
