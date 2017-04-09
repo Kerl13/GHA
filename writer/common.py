@@ -82,8 +82,7 @@ class RichTextMixin():
 class RichTextList():
     def __init__(self, lines):
         assert isinstance(lines, list)
-        if lines:
-            assert isinstance(lines[0], RichTextMixin)
+        assert(all(isinstance(l, RichTextMixin) for l in lines))
         self.lines = lines
 
     # ---
@@ -94,7 +93,12 @@ class RichTextList():
         return len(self.lines)
 
     def __getitem__(self, key):
-        return self.lines[key]
+        if isinstance(key, int):
+            return self.lines[key]
+        elif isinstance(key, slice):
+            return RichTextList(self.lines.__getitem__(key))
+        else:
+            raise NotImplementedError
 
     # ---
     # These methods define how the list should be displayed.
