@@ -77,6 +77,8 @@ def parse_push(ctxt, hook):
             author=ctxt.get_or_create_user(**commit["author"]),
         ) for commit in hook["commits"]
     ]
+    if commits == []:
+        return None
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
