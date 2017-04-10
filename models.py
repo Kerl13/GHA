@@ -89,7 +89,7 @@ class Push(Event, RichTextMixin):
 
     def get_context(self):
         context = RichTextMixin.get_context(self)
-        context["commits"] = context["commits"][5:]
+        context["commits"] = context["commits"][-5:]
         context["nb"] = len(self.commits)
         return context
 
