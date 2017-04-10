@@ -99,7 +99,7 @@ def parse_issue(ctxt, hook):
     return Issue(
         user=ctxt.user,
         project=ctxt.project,
-        id=attrs["id"],
+        id=attrs["iid"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
         url=attrs["url"]
@@ -109,7 +109,7 @@ def parse_issue(ctxt, hook):
 def parse_merge_request(ctxt, hook):
     attrs = hook["object_attributes"]
     return MergeRequest(
-        id=attrs["id"],
+        id=attrs["iid"],
         title=attrs["title"],
         action=_preterit(attrs["action"]),
         url=attrs["url"],
