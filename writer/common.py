@@ -37,6 +37,8 @@ class RichTextMixin():
         for key, value in context.items():
             if isinstance(value, RichTextList):
                 context[key] = value.render_simple()
+            elif isinstance(value, RichTextMixin):
+                context[key] = value.render_simple()
         return template.format(**context)
 
     def render_irccolors(self):
@@ -60,6 +62,8 @@ class RichTextMixin():
                     RuntimeWarning
                 )
             if isinstance(value, RichTextList):
+                context[key] = value.render_irccolors()
+            elif isinstance(value, RichTextMixin):
                 context[key] = value.render_irccolors()
         return template.format(**context)
 

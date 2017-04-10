@@ -34,13 +34,12 @@ class User():
         return self.name
 
 
-class Project():
+class Project(RichTextMixin):
+    TEMPLATE = "[{name}]"
+
     def __init__(self, name, url):
         self.name = name
         self.url = url
-
-    def __str__(self):
-        return self.name
 
 
 class Commit(RichTextMixin):
@@ -75,7 +74,7 @@ class Event():
 
 class Push(Event, RichTextMixin):
     TEMPLATE = (
-        "[{project}] {user} pushed {nb} commits to {branch}. ({url})\n"
+        "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
         "{commits}"
     )
 
@@ -95,7 +94,7 @@ class Push(Event, RichTextMixin):
 
 
 class Tag(Event, RichTextMixin):
-    TEMPLATE = "[{project}] {user} added the tag {tag_name}"
+    TEMPLATE = "{project} {user} added the tag {tag_name}"
 
     def __init__(self, name, **kwargs):
         Event.__init__(self, **kwargs)
@@ -104,7 +103,7 @@ class Tag(Event, RichTextMixin):
 
 class Issue(Event, RichTextMixin):
     TEMPLATE = (
-        "[{project}] {user} {action} issue #{id}: {title}. ({url})"
+        "{project} {user} {action} issue #{id}: {title}. ({url})"
     )
 
     def __init__(self, id, title, action, url, **kwargs):
@@ -117,7 +116,7 @@ class Issue(Event, RichTextMixin):
 
 class MergeRequest(Event, RichTextMixin):
     TEMPLATE = (
-        "[{project}] {user} {action} merge request !{id}: {title}. ({url})"
+        "{project} {user} {action} merge request !{id}: {title}. ({url})"
     )
 
     def __init__(self, id, title, action, url, **kwargs):
@@ -143,7 +142,7 @@ class WikiPage(RichTextMixin):
 
 
 class Wiki(Event, RichTextMixin):
-    TEMPLATE = "[{project}] {user} updated the wiki\n{wiki_pages}"
+    TEMPLATE = "{project} {user} updated the wiki\n{wiki_pages}"
 
     def __init__(self, pages, **kwargs):
         Event.__init__(self, **kwargs)
