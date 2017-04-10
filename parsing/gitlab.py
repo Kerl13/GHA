@@ -7,7 +7,7 @@ The only function you should use is ``parse``, the others are called by
 """
 
 import warnings
-from .common import ParserContext, UnknownKindWarning
+from .common import ParserContext, UnknownKindWarning, UnknownActionWarning
 from models import (
     Project, Push, Tag, Commit, Issue, MergeRequest, WikiPage, Wiki
 )
@@ -16,8 +16,13 @@ from models import (
 def _preterit(action):
     if action in ["open"]:
         return "{}ed".format(action)
-    elif action in ["update", "close", "create"]:
+    elif action in ["update", "close", "create", "merge"]:
         return "{}d".format(action)
+    else:
+        warnings.warn(
+            "Unknowned action: {}".format(action),
+            UnknownActionWarning
+        )
 
 
 def parse(hook):

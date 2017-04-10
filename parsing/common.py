@@ -13,6 +13,13 @@ class UnknownKindWarning(Warning):
     pass
 
 
+class UnknownActionWarning(Warning):
+    """
+    Warning raised when the parser cannot conjugate an action.
+    """
+    pass
+
+
 class ParserContext():
     """
     This class stores
