@@ -22,7 +22,8 @@ The only function you should use is ``parse``, the others are called by
 import warnings
 from .common import ParserContext, UnknownKindWarning
 from models import (
-    Project, Commit, Push, Issue, MergeRequest, Delete, WikiPage, Wiki
+    Project, Commit, Push, Issue, MergeRequest, Deletion, Creation,
+    WikiPage, Wiki
 )
 
 
@@ -38,7 +39,10 @@ def parse(header, hook):
     if kind == "push":
         ctxt.user = (hook["pusher"]["name"], hook["pusher"]["email"])
         return parse_push(ctxt, hook)
-    elif kind == "delete":
+    elif kind == "create" and hook["ref_type"] == "branch":
+        ctxt.user = (hook["sender"]["login"], None)
+        return parse_creation(ctxt, hook)
+    elif kind == "delete" and hook["ref_type"] == "branch":
         ctxt.user = (hook["sender"]["login"], None)
         return parse_deletion(ctxt, hook)
     elif kind == "issues":
@@ -85,8 +89,23 @@ def parse_push(ctxt, hook):
     )
 
 
+def parse_creation(ctxt, hook):
+    branch_url = hook["ref"].split('/')[2:]
+    return Creation(
+        commits=[],
+        branch=hook["ref"].split('/')[-1],
+        user=ctxt.user,
+        project=ctxt.project,
+        url=(
+            "{}/tree/{}"
+            .format(hook["repository"]["html_url"],
+                    '/'.join(branch_url))
+        )
+    )
+
+
 def parse_deletion(ctxt, hook):
-    return Delete(
+    return Deletion(
         branch=hook["ref"].split('/')[-1],
         user=ctxt.user,
         project=ctxt.project

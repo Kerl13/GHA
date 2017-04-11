@@ -127,6 +127,27 @@ class MergeRequest(Event, RichTextMixin):
         self.url = url
 
 
+class Creation(Event, RichTextMixin):
+    TEMPLATE = (
+        "{project} {user} created branch {branch} with {nb} commits. ({url})\n"
+        "{commits}"
+    )
+
+    def __init__(self, branch, commits, url, **kwargs):
+        assert isinstance(commits, list)
+        assert all(isinstance(commit, Commit) for commit in commits)
+        Event.__init__(self, **kwargs)
+        self.branch = branch
+        self.commits = RichTextList(commits)
+        self.url = url
+
+    def get_context(self):
+        context = RichTextMixin.get_context(self)
+        context["commits"] = context["commits"][-5:]
+        context["nb"] = len(self.commits)
+        return context
+
+
 class Deletion(Event, RichTextMixin):
     TEMPLATE = (
         "{project} {user} deleted branch {branch}."
@@ -139,6 +160,7 @@ class Deletion(Event, RichTextMixin):
 # ---
 # Wiki related models
 # ---
+
 
 class WikiPage(RichTextMixin):
     TEMPLATE = "{action} page {page_name}: {title}. ({url})"

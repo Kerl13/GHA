@@ -10,7 +10,8 @@ import warnings
 import re
 from .common import ParserContext, UnknownKindWarning, UnknownActionWarning
 from models import (
-    Project, Push, Tag, Commit, Issue, MergeRequest, Deletion, WikiPage, Wiki
+    Project, Push, Tag, Commit, Issue, MergeRequest, Deletion, Creation,
+    WikiPage, Wiki
 )
 
 
@@ -40,7 +41,10 @@ def parse(hook):
         reg = re.compile("^0+$")
         if (reg.match(hook["after"])):
             return parse_deletion(ctxt, hook)
-        return parse_push(ctxt, hook)
+        elif (reg.match(hook["before"])):
+            return parse_creation(ctxt, hook)
+        else:
+            return parse_push(ctxt, hook)
     elif kind == "tag_push":
         parse_project(ctxt, hook["project"])
         ctxt.user = (hook["user_name"], None)
@@ -81,8 +85,6 @@ def parse_push(ctxt, hook):
             author=ctxt.get_or_create_user(**commit["author"]),
         ) for commit in hook["commits"]
     ]
-    if commits == []:
-        return None
     return Push(
         branch=hook["ref"].split('/')[-1],
         commits=commits,
@@ -126,6 +128,29 @@ def parse_merge_request(ctxt, hook):
         url=attrs["url"],
         user=ctxt.user,
         project=ctxt.project
+    )
+
+
+def parse_creation(ctxt, hook):
+    commits = [
+        Commit(
+            id=commit["id"],
+            message=commit["message"],
+            url=commit["url"],
+            author=ctxt.get_or_create_user(**commit["author"]),
+        ) for commit in hook["commits"]
+    ]
+    return Creation(
+        branch=hook["ref"].split('/')[-1],
+        commits=commits,
+        url=(
+            "{}/compare/{}...{}"
+            .format(hook["project"]["web_url"],
+                    hook["project"]["default_branch"],
+                    hook["after"])
+        ),
+        user=ctxt.user,
+        project=ctxt.project,
     )
 
 
