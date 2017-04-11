@@ -127,6 +127,15 @@ class MergeRequest(Event, RichTextMixin):
         self.url = url
 
 
+class Deletion(Event, RichTextMixin):
+    TEMPLATE = (
+        "{project} {user} deleted branch {branch}."
+    )
+
+    def __init__(self, branch, **kwargs):
+        Event.__init__(self, **kwargs)
+        self.branch = branch
+
 # ---
 # Wiki related models
 # ---

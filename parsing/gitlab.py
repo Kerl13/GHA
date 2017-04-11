@@ -7,9 +7,10 @@ The only function you should use is ``parse``, the others are called by
 """
 
 import warnings
+import re
 from .common import ParserContext, UnknownKindWarning, UnknownActionWarning
 from models import (
-    Project, Push, Tag, Commit, Issue, MergeRequest, WikiPage, Wiki
+    Project, Push, Tag, Commit, Issue, MergeRequest, Deletion, WikiPage, Wiki
 )
 
 
@@ -36,6 +37,9 @@ def parse(hook):
     if kind == "push":
         parse_project(ctxt, hook["project"])
         ctxt.user = (hook["user_name"], hook["user_email"])
+        reg = re.compile("^0+$")
+        if (reg.match(hook["after"])):
+            return parse_deletion(ctxt, hook)
         return parse_push(ctxt, hook)
     elif kind == "tag_push":
         parse_project(ctxt, hook["project"])
@@ -120,6 +124,14 @@ def parse_merge_request(ctxt, hook):
         title=attrs["title"],
         action=_preterit(attrs["action"]),
         url=attrs["url"],
+        user=ctxt.user,
+        project=ctxt.project
+    )
+
+
+def parse_deletion(ctxt, hook):
+    return Deletion(
+        branch=hook["ref"].split('/')[-1],
         user=ctxt.user,
         project=ctxt.project
     )
