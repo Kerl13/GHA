@@ -5,16 +5,21 @@ A GitHub Announcer for IRC. Also support GitLab.
 
 This project is made of :
 
-- A ([Bottle](http://bottlepy.org/docs/dev/index.html)) web server receiving web hooks from GitHub or GitLab
-- An [IRCBot](http://sourceforge.net/projects/python-irclib/files/) writing on IRC.
+- A web server receiving web hooks from GitHub or GitLab
+- An [IRCBot](https://pypi.python.org/pypi/irc) writing on IRC.
 
-Since it is using the python-irclib files, GHA uses python2.
-
+It has been completely rewritten in python3 and does not support python 2 anymore
 
 Get started
 -----------
 
-Just copy the files to some place (or clone this repository).
+1. Copy the files to some place (or clone this repository).
+2. Install the dependencies (you may want to use a
+   [virtual environment](https://pypi.python.org/pypi/virtualenv))
+
+```
+pip3 install --upgrade -r requirements.txt
+```
 
 Try `./GHA.py --help`. You should see something like
 
@@ -52,8 +57,9 @@ A simple case to get started:
 
 This will create the file `my.cnf` containing the configuration for a GitHub Announcer listening on `0.0.0.0:9090`, and connected on `irc.freenode.net/6667` on channel `#GHA`.
 You can change the listening host with `-lh`, the IRC port with `-ip`, the IRC name of the bot with `-in`.
-You can tell GHA to report error messages to a specific personne using the `-re`
+You can tell GHA to report error messages to a specific person using the `-re`
 option.
+
 Note that the channel list must be quoted, since `#` is a special character in shell.
 
 After that, you just need to use:
@@ -61,7 +67,7 @@ After that, you just need to use:
     ./GHA.py -ia my-gha.cnf
 
 You can change the `my-gha.cnf` yourself, if you respect the JSON syntax
-[supported by python](https://docs.python.org/2/library/json.html).
+[supported by python](https://docs.python.org/3/library/json.html).
 
 Now that your `GHA` is running, you just have to
 [set your GitHub/GitLab webhooks](https://github.com/Niols/GHA/wiki/Add-a-WebHook).
@@ -77,7 +83,7 @@ But:
 
 - This script also support GitLab.
 - The bot stays on the IRC chan, and do not join-part all the time.
-- A script can easely be modified, if you want to change a little part of it.
+- A script can easily be modified, if you want to change a little part of it.
 
 
 License
