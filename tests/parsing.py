@@ -4,7 +4,8 @@ import json
 
 from parsing.gitlab import parse as gitlab_parse
 from parsing.github import parse as github_parse
-from models import Push, Tag, Issue, MergeRequest, WikiPage, Wiki
+from models import (Push, Tag, Issue, MergeRequest, Creation, Deletion,
+                    WikiPage, Wiki)
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -24,6 +25,8 @@ class TestParsing(unittest.TestCase):
 class TestGitlabParsing(TestParsing):
     INPUTS = [
         ("push", "gitlab/push.json"),
+        ("creation", "gitlab/creation.json"),
+        ("deletion", "gitlab/deletion.json"),
         ("tag", "gitlab/tag.json"),
         ("issue", "gitlab/issue.json"),
         ("merge_request", "gitlab/merge_request.json"),
@@ -41,6 +44,24 @@ class TestGitlabParsing(TestParsing):
             < git_obj.url.find(self.push["before"])
             < git_obj.url.find(self.push["after"])
         )
+
+    def test_creation(self):
+        git_obj = gitlab_parse(self.creation)
+        self.assertIsInstance(git_obj, Creation)
+        self.assertEqual(git_obj.branch, "new")
+        self.assertEqual(len(git_obj.commits), 2)
+        self.assertTrue(
+            -1
+            < git_obj.url.find(git_obj.project.url)
+            < git_obj.url.find("master")
+            < git_obj.url.find(self.push["after"])
+        )
+
+    def test_deletion(self):
+        git_obj = gitlab_parse(self.deletion)
+        self.assertIsInstance(git_obj, Deletion)
+        self.assertEqual(git_obj.branch, "deleted")
+
 
     def test_tag(self):
         git_obj = gitlab_parse(self.tag)
@@ -84,6 +105,8 @@ class TestGitlabParsing(TestParsing):
 class TestGithubParsing(TestParsing):
     INPUTS = [
         ("push", "github/push.json"),
+        ("creation", "github/creation.json"),
+        ("deletion", "github/deletion.json"),
         ("issue", "github/issue.json"),
         ("merge_request", "github/merge_request.json"),
         ("wiki", "github/wiki.json"),
@@ -102,6 +125,26 @@ class TestGithubParsing(TestParsing):
             "9049f1265b7d...0d1a26e67d8f"
         )
         self.assertEqual(len(git_obj.commits), 1)
+
+    def test_creation(self):
+        git_obj = github_parse(
+            {"X-GitHub-Event": "create"},
+            self.creation
+        )
+        self.assertIsInstance(git_obj, Creation)
+        self.assertEqual(git_obj.branch, "new")
+        self.assertEqual(
+            git_obj.url,
+            "https://github.com/baxterthehacker/public-repo/tree/new"
+        )
+
+    def test_deletion(self):
+        git_obj = github_parse(
+            {"X-GitHub-Event": "delete"},
+            self.deletion
+        )
+        self.assertIsInstance(git_obj, Deletion)
+        self.assertEqual(git_obj.branch, "deleted")
 
     def test_issue(self):
         git_obj = github_parse(
