@@ -14,9 +14,9 @@ from models import (
 
 
 def _preterit(action):
-    if action in ["open"]:
+    if action in {"open", "reopen"}:
         return "{}ed".format(action)
-    elif action in ["update", "close", "create", "merge"]:
+    elif action in {"update", "close", "create", "merge"}:
         return "{}d".format(action)
     else:
         warnings.warn(
