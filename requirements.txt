@@ -1,2 +1,3 @@
 requests
 irc
+git+https://github.com/Kerl13/richstr.git#egg=richstr

@@ -8,6 +8,7 @@ output formats correspond to the ``render_*`` methods.
 
 import requests
 import warnings
+from richstr.models import RichStr
 from .irc import Color as C, CONFIG
 
 
@@ -18,7 +19,7 @@ class RichTextError(Exception):
     pass
 
 
-class RichTextMixin():
+class RichTextMixin(RichStr):
     """
     ``RichTextMixin`` adds rendering methods to an object.
 
@@ -29,10 +30,8 @@ class RichTextMixin():
     By default, ``get_context`` will return ``self.__dict__``. If you want to
     add some stuff to the context, you have to override this method.
     """
-    TEMPLATE = ""
-
     def render_simple(self):
-        template = self._get_template()
+        template = self.get_template()
         context = self.get_context()
         for key, value in context.items():
             if isinstance(value, RichTextList):
@@ -47,7 +46,7 @@ class RichTextMixin():
 
         See the writer.irc module for details.
         """
-        template = self._get_template()
+        template = self.get_template()
         context = self.get_context()
         for key, value in context.items():
             if isinstance(value, RichTextList):
@@ -67,21 +66,6 @@ class RichTextMixin():
                 )
             context[key] = value
         return template.format(**context)
-
-    def _get_template(self):
-        if not self.TEMPLATE:
-            raise RichTextError("No template provided")
-        else:
-            return self.TEMPLATE
-
-    def get_context(self):
-        """
-        This method is called by the ``render_*`` methods to get the context
-        they will use to fill the template.
-
-        You have to override it in order to alter the rendering context.
-        """
-        return self.__dict__
 
 
 class RichTextList():
