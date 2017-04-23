@@ -72,12 +72,7 @@ class Event():
 # ---
 
 
-class Push(Event, RichTextMixin):
-    TEMPLATE = (
-        "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
-        "{commits}"
-    )
-
+class PushEvent(Event, RichTextMixin):
     def __init__(self, branch, commits, url, **kwargs):
         assert isinstance(commits, list)
         assert all(isinstance(commit, Commit) for commit in commits)
@@ -91,6 +86,21 @@ class Push(Event, RichTextMixin):
         context["commits"] = context["commits"][-5:]
         context["nb"] = len(self.commits)
         return context
+
+
+class Push(PushEvent, RichTextMixin):
+    TEMPLATE = (
+        "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
+        "{commits}"
+    )
+
+
+class Creation(PushEvent, RichTextMixin):
+    TEMPLATE = (
+        "{project} {user} created branch {branch} with {nb} commits. ({url})\n"
+        "{commits}"
+    )
+
 
 
 class Tag(Event, RichTextMixin):
@@ -125,27 +135,6 @@ class MergeRequest(Event, RichTextMixin):
         self.title = title
         self.action = action
         self.url = url
-
-
-class Creation(Event, RichTextMixin):
-    TEMPLATE = (
-        "{project} {user} created branch {branch} with {nb} commits. ({url})\n"
-        "{commits}"
-    )
-
-    def __init__(self, branch, commits, url, **kwargs):
-        assert isinstance(commits, list)
-        assert all(isinstance(commit, Commit) for commit in commits)
-        Event.__init__(self, **kwargs)
-        self.branch = branch
-        self.commits = RichTextList(commits)
-        self.url = url
-
-    def get_context(self):
-        context = RichTextMixin.get_context(self)
-        context["commits"] = context["commits"][-5:]
-        context["nb"] = len(self.commits)
-        return context
 
 
 class Deletion(Event, RichTextMixin):
