@@ -62,7 +62,6 @@ class TestGitlabParsing(TestParsing):
         self.assertIsInstance(git_obj, Deletion)
         self.assertEqual(git_obj.branch, "deleted")
 
-
     def test_tag(self):
         git_obj = gitlab_parse(self.tag)
         self.assertIsInstance(git_obj, Tag)

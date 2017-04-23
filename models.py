@@ -102,7 +102,6 @@ class Creation(PushEvent):
     )
 
 
-
 class Tag(Event, RichTextMixin):
     TEMPLATE = "{project} {user} added the tag {tag_name}"
 
