@@ -88,14 +88,14 @@ class PushEvent(Event, RichTextMixin):
         return context
 
 
-class Push(PushEvent, RichTextMixin):
+class Push(PushEvent):
     TEMPLATE = (
         "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
         "{commits}"
     )
 
 
-class Creation(PushEvent, RichTextMixin):
+class Creation(PushEvent):
     TEMPLATE = (
         "{project} {user} created branch {branch} with {nb} commits. ({url})\n"
         "{commits}"
