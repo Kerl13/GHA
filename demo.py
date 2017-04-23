@@ -14,13 +14,17 @@ GITLAB_INPUTS = [
     ("push", "push.json"),
     ("tag", "tag.json"),
     ("issue", "issue.json"),
-    ("merge_request", "merge_request.json")
+    ("merge_request", "merge_request.json"),
+    ("create", "creation.json"),
+    ("delete", "deletion.json"),
 ]
 
 GITHUB_INPUTS = [
     ("push", "push.json"),
     ("issues", "issue.json"),
-    ("pull_request", "merge_request.json")
+    ("pull_request", "merge_request.json"),
+    ("create", "creation.json"),
+    ("delete", "deletion.json"),
 ]
 
 
