@@ -72,12 +72,7 @@ class Event():
 # ---
 
 
-class Push(Event, RichTextMixin):
-    TEMPLATE = (
-        "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
-        "{commits}"
-    )
-
+class PushEvent(Event, RichTextMixin):
     def __init__(self, branch, commits, url, **kwargs):
         assert isinstance(commits, list)
         assert all(isinstance(commit, Commit) for commit in commits)
@@ -91,6 +86,21 @@ class Push(Event, RichTextMixin):
         context["commits"] = context["commits"][-5:]
         context["nb"] = len(self.commits)
         return context
+
+
+class Push(PushEvent):
+    TEMPLATE = (
+        "{project} {user} pushed {nb} commits to {branch}. ({url})\n"
+        "{commits}"
+    )
+
+
+class Creation(PushEvent):
+    TEMPLATE = (
+        "{project} {user} created branch {branch} with {nb} commits. ({url})\n"
+        "{commits}"
+    )
+
 
 
 class Tag(Event, RichTextMixin):
@@ -127,9 +137,19 @@ class MergeRequest(Event, RichTextMixin):
         self.url = url
 
 
+class Deletion(Event, RichTextMixin):
+    TEMPLATE = (
+        "{project} {user} deleted branch {branch}."
+    )
+
+    def __init__(self, branch, **kwargs):
+        Event.__init__(self, **kwargs)
+        self.branch = branch
+
 # ---
 # Wiki related models
 # ---
+
 
 class WikiPage(RichTextMixin):
     TEMPLATE = "{action} page {page_name}: {title}. ({url})"
