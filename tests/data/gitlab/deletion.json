@@ -3,7 +3,7 @@
   "before": "95790bf891e76fee5e1747ab589903a6a1f80f22",
   "after": "0000000000000000000000000000000000000000",
   "ref": "refs/heads/deleted",
-  "checkout_sha": None,
+  "checkout_sha": null,
   "user_id": 4,
   "user_name": "John Smith",
   "user_email": "john@example.com",
