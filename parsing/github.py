@@ -90,7 +90,7 @@ def parse_push(ctxt, hook):
 
 
 def parse_creation(ctxt, hook):
-    branch_url = hook["ref"].split('/')[2:]
+    branch_url = '/'.join(hook["ref"].split('/')[2:])
     return Creation(
         commits=[],
         branch=hook["ref"].split('/')[-1],
@@ -99,7 +99,7 @@ def parse_creation(ctxt, hook):
         url=(
             "{}/tree/{}"
             .format(hook["repository"]["html_url"],
-                    '/'.join(branch_url))
+                    branch_url)
         )
     )
 
