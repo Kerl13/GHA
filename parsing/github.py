@@ -81,7 +81,7 @@ def parse_push(ctxt, hook):
         ) for commit in hook["commits"]
     ]
     return Push(
-        branch=hook["ref"].split('/')[-1],
+        branch='/'.join(hook["ref"].split('/')[2:]),
         commits=commits,
         url=hook["compare"],
         user=ctxt.user,
