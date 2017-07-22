@@ -14,6 +14,7 @@
 import logging
 from multiprocessing import Process
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import UnixStreamServer
 
 # This one is the class Queue whereas multiprocessing.Queue is just a function…
 # Yeah this python developers have a great sense of humour
@@ -25,6 +26,16 @@ from multiprocessing.queues import Queue
 # ---
 
 class SimplePOSTHandler(BaseHTTPRequestHandler):
+    def parse_request(self):
+        """
+        If no client address is provided, look for the X-Real-IP header
+        """
+        success = super().parse_request()
+        if success:
+            if not self.client_address and "X-Real-IP" in self.headers:
+                self.client_address = (self.headers.get("X-Real-IP"), None)
+        return success
+
     def do_POST(self):
         """
         Handle git{lab,hub}'s POST requests.
@@ -39,15 +50,18 @@ class SimplePOSTHandler(BaseHTTPRequestHandler):
         self.server.hooks_queue.put((self.headers, body))
 
 
-class MyHTTPServer(HTTPServer):
-    """
-    This server class has also two queues to allow it to communicate with other
-    threads.
-    """
-    def __init__(self, server_address, handler_cls, hooks_queue):
+class GHAUnixStreamServer(UnixStreamServer):
+    def __init__(self, hooks_queue, *args, **kwargs):
         assert isinstance(hooks_queue, Queue)
+        super().__init__(*args, **kwargs)
         self.hooks_queue = hooks_queue
-        super().__init__(server_address, handler_cls)
+
+
+class GHAHTTPServer(HTTPServer):
+    def __init__(self, hooks_queue, *args, **kwargs):
+        assert isinstance(hooks_queue, Queue)
+        super().__init__(*args, **kwargs)
+        self.hooks_queue = hooks_queue
 
 
 # ---
@@ -55,15 +69,27 @@ class MyHTTPServer(HTTPServer):
 # ---
 
 class HooksHandlerThread(Process):
-
-    def __init__(self, queue, host='localhost', port=80):
+    def __init__(self, queue, type, bind):
         assert isinstance(queue, Queue)
         super().__init__()
-        self.host = host
-        self.port = port
         self.queue = queue
-        self.app = MyHTTPServer((host, port), SimplePOSTHandler, queue)
-        logging.info('Ignited on %s:%s', host, port)
+        self._init_app(type, bind)
+
+    def _init_app(self, type, bind):
+        if type == "http":
+            host, port = bind
+            self.app = GHAHTTPServer(
+                self.queue, (host, port), SimplePOSTHandler
+            )
+            logging.info("Ignited on %s:%d", host, port)
+
+        elif type == "unix":
+            self.app = GHAUnixStreamServer(self.queue, bind, SimplePOSTHandler)
+            logging.info("Ignited on unix:/%s", bind)
+
+        else:
+            logging.critical("Unknown server type: %s. Aborting.", type)
+            exit(1)
 
     def run(self):
         try:

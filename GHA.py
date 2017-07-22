@@ -41,8 +41,8 @@ class GHA(Process):
     def start_webserver(self):
         hht = HooksHandlerThread(
             self.hooks_queue,
-            self.config.listen_host,
-            self.config.listen_port
+            type="http" if isinstance(self.config.bind, tuple) else "unix",
+            bind=config.bind
         )
         hht.start()
         logging.info("HooksHandlerThread's pid: {:d}".format(hht.pid))
@@ -114,13 +114,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=DESCRIPTION, prog=argv[0])
 
-    parser.add_argument('-lh', '--listen-host',
+    parser.add_argument("-b", "--bind",
+                        metavar="ADDRESS",
                         type=str,
-                        help='the address where GHA will be listening')
-
-    parser.add_argument('-lp', '--listen-port',
-                        type=int,
-                        help='the port where GHA will be listening')
+                        help="The socket to bind. Either a host:port pair or "
+                             "a unix socket prefixed by 'unix:'")
 
     parser.add_argument('-ih', '--irc-host',
                         type=str,
@@ -206,13 +204,20 @@ if __name__ == "__main__":
                     logging.error(line)
             exit(1)
 
-    if not config.listen_host:
-        logging.info('No listen host given. Using 0.0.0.0.')
-        config.listen_host = '0.0.0.0'
-
-    if not config.listen_port:
-        logging.info('No listen port given. Using 80.')
-        config.listen_port = 80
+    if not config.bind:
+        default = "127.0.0.1:80"
+        logging.info("No listen address given. Using %s", default)
+        config.bind = default
+    if config.bind.startswith("unix:"):
+        config.bind = config.bind.split("unix:")[1]
+    elif ':' in config.bind:
+        host, port = config.bind.split(':')[:2]
+        try:
+            port = int(port)
+        except (ValueError, TypeError):
+            logging.error("Invalid port in bind address: %s", config.bind)
+            exit(1)
+        config.bind = (host, port)
 
     if not config.irc_host:
         logging.info('No IRC host given. Using localhost.')
